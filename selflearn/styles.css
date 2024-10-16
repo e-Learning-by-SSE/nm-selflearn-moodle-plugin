@@ -1,0 +1,73 @@
+.selflearn_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.selflearn_table thead th {
+    background-color: #f3f3f3;
+    color: #333;
+    text-align: left;
+    padding: 10px 15px;
+}
+
+.selflearn_table td {
+    padding: 10px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.selflearn_table tbody tr {
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.selflearn_table tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+}
+
+.selflearn_table tfoot td {
+    text-align: left;
+    padding: 10px 15px;
+    color: #555;
+    font-weight: bold;
+}
+
+.selflearn_table .profile {
+    display: flex;
+    align-items: center;
+}
+
+.selflearn_table .avatar {
+    display: inline-block;
+    background-color: #ddd;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    line-height: 35px;
+    font-weight: bold;
+    color: #333;
+    margin-right: 10px;
+}
+
+.selflearn_table select {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.selflearn_table a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.selflearn_table a:hover {
+    text-decoration: underline;
+}
+
+.selflearn_table .average {
+    background-color: #f3f3f3;
+    font-size: 0.9em;
+}
