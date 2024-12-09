@@ -16,7 +16,7 @@ class mod_selflearn_mod_form extends moodleform_mod {
 
         global $USER;
         $username = $USER->username;
-        $courses = selflearn_list_courses($username);
+        $courses = selflearn_list_courses($username, null);
         $options = [];
         foreach ($courses as $item) {
             $options[$item['id']] = $item['name'];

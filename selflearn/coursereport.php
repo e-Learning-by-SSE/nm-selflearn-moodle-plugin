@@ -2,8 +2,8 @@
 require_once("../../config.php");
 require_once("lib.php");
 
-
 $id = required_param('id', PARAM_INT); // Course Id.
+$cache = cache::make('mod_selflearn', 'report_cache');
 
 // Access + permissions.
 $course = get_course($id);
@@ -13,21 +13,10 @@ require_login($id);
 $context = context_course::instance($id);
 require_capability('mod/selflearn:viewgrades', $context);
 
-
 // Fetch the enrolled users in the course
 $enrolled_users = get_enrolled_users($context);
 $sortby = optional_param('sortby', '0', PARAM_INT);
 $sortorder = optional_param('sortorder', 'ASC', PARAM_ALPHA);
-// // Sort the enrolled users by first name or last name, depending on the user's choice
-// if ($sortby == 'firstname') {
-//     usort($enrolled_users, function($a, $b) use ($sortorder) {
-//         return $sortorder == 'ASC' ? strcmp($a->firstname, $b->firstname) : strcmp($b->firstname, $a->firstname);
-//     });
-// } elseif ($sortby == 'lastname') {
-//     usort($enrolled_users, function($a, $b) use ($sortorder) {
-//         return $sortorder == 'ASC' ? strcmp($a->lastname, $b->lastname) : strcmp($b->lastname, $a->lastname);
-//     });
-// }
 
 // Determine the next sort order for the links
 $nextsortorder = ($sortorder == 'ASC') ? 'DESC' : 'ASC';
@@ -84,26 +73,38 @@ if (empty($courses)) {
     die();
 }
 
-$progress = selflearn_query_progress($students, $courses);
-
 $merged = [];
-foreach ($students as $user) {
-    // Initialisiere ein Array mit den Grundinformationen des Benutzers
-    $combined = [
-        $user->firstname,
-        $user->lastname
-    ];
+$data = $cache->get($id);
+if ($data === false) {
+    $progress = selflearn_query_progress($students, $courses);
+    
+    foreach ($students as $user) {
+        // Init array with user data
+        $combined = [
+            $user->firstname,
+            $user->lastname
+        ];
 
-    // Suche in $values nach der ID (username)
-    foreach ($courses as $course) {
-        $id = $course['slug'];
-        $value = $progress[$user->username][$id];
-        $combined[] = $value;
+        // Search for the progress of the user for each SelfLearn activity
+        foreach ($courses as $course) {
+            $id = $course['slug'];
+            $value = $progress[$user->username][$id];
+            $combined[] = $value;
+        }
+        $combined[] = $progress[$user->username]['total_average'];
+
+        // Combine data
+        $merged[] = $combined;
     }
-    $combined[] = $progress[$user->username]['total_average'];
+    
+    $data = new stdClass();
+    $data->data = $merged;
+    $data->courses = array_column($instances, 'name');
 
-    // Füge das kombinierte Ergebnis zum finalen Array hinzu
-    $merged[] = $combined;
+    // Store the computed data in the cache
+    $cache->set($id, $data);
+} else {
+    $merged = $data->data;
 }
 
 usort($merged, function($a, $b) use ($sortby, $sortorder) {
@@ -113,10 +114,6 @@ usort($merged, function($a, $b) use ($sortby, $sortorder) {
     }
     return $sortorder == 'ASC' ? $a[$index] <=> $b[$index] : $b[$index] <=> $a[$index];
 });
-
-// Das Ergebnis anzeigen
-$debug = print_r($merged, true);
-error_log($debug);
 
 // Page setup.
 global $PAGE, $OUTPUT;
@@ -150,14 +147,14 @@ foreach ($merged as $entry) {
     for ($i = 0; $i < count($entry); $i++) {
         echo '<td>' . $entry[$i] . '</td>';
     }
-    // echo '<td>' . $entry[0] . '</td>';
-    // echo '<td>' . $entry[1] . '</td>';
-    // foreach ($instances as $instance) {
-    //     echo '<td>' . $progress[$user->username][$instances['slug']] . ' %</td>';
-    // }
-    // echo '<td>' . $progress[$user->username]["total_average"] . ' %</td>';
     echo '</tr>';
 }
 echo '</table>';
+
+echo html_writer::link(
+    new moodle_url('/mod/selflearn/excelexport.php?id=' . $id), 
+    get_string("report::export_btn", "selflearn"), 
+    ['class' => 'btn btn-primary']
+);
 
 echo $OUTPUT->footer();
