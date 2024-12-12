@@ -4,7 +4,7 @@ use core_external\external_function_parameters;
 use core_external\external_value;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/filelib.php');
-require_once($CFG->dirroot . '/mod/selflearn/lib.php');
+require_once($CFG->dirroot . '/mod/selflearn/rest_client.php');
 
 class mod_selflearn_external extends external_api {
 

@@ -87,8 +87,8 @@ if ($data === false) {
 
         // Search for the progress of the user for each SelfLearn activity
         foreach ($courses as $course) {
-            $id = $course['slug'];
-            $value = $progress[$user->username][$id];
+            $slug = $course['slug'];
+            $value = $progress[$user->username][$slug];
             $combined[] = $value;
         }
         $combined[] = $progress[$user->username]['total_average'];

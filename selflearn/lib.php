@@ -9,122 +9,13 @@
  */
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/filelib.php');
-
-use core\output\notification;
-
-global $SELFLEARN_BASE_URL;
-$SELFLEARN_BASE_URL = "http://app:4200/api/rest/";
-
-global $SELFLEARN_COURSES;
-$SELFLEARN_COURSES = $SELFLEARN_BASE_URL . "courses";
+require_once(dirname(__FILE__) . '/rest_client.php');
 
 global $SELFLEARN_API_COURSE_DATA;
 $SELFLEARN_API_COURSE_DATA = $SELFLEARN_BASE_URL . "skill-repositories/byId/";
 
 global $SELFLEARN_WEB_COURSE_URL;
 $SELFLEARN_WEB_COURSE_URL = "https://www.uni-hildesheim.de/selflearn/courses/";
-
-/**
- * Searches for courses to imports. Requires either `$userId` or `$title` to be set.
- * @param string $userid The userId of the author. If this parameter is set, all courses of the authors are returned.
- * @param string $title The title of the course to search for. If this parameter is set,
- * only courses with the given string in the title are returned, independent of the author.
- */
-function selflearn_list_courses($userid, $title) {
-    GLOBAL $OUTPUT, $SELFLEARN_COURSES;
-
-    $curl = new curl();
-    $search_params = [];
-    if ($title != null) {
-        $search_params = [
-            'title' => $title,
-            'page' => 1,
-        ];
-    } else {
-        $search_params = [
-            'authorId' => "zaepernickrothe", // $userid,
-            'page' => 1,
-        ];
-    }
-    $response = $curl->get($SELFLEARN_COURSES, $search_params);
-    $data = json_decode($response, true);
-
-
-    $courses = [];
-    if (json_last_error() != JSON_ERROR_NONE && !is_array($data)) {
-        $error_message = get_string('error_rest_api_blocked', 'selflearn');
-        $notification = new notification($error_message, notification::NOTIFY_ERROR);
-        echo $OUTPUT->render($notification);
-    } else {
-        foreach ($data["result"] as $course) {
-            $courses[] = [
-                'id' => $course['slug'],
-                'name' => $course['title']
-            ];
-        }
-    }
-
-    return $courses;
-}
-
-function selflearn_get_course_title($slug) {
-    GLOBAL $OUTPUT, $SELFLEARN_COURSES;
-    $lms_url = $SELFLEARN_COURSES . "/" . $slug;
-
-    // Query
-    $curl = new curl();
-    $response = $curl->get($lms_url);
-    $http_status = $curl->info['http_code'];
-    
-    if ($http_status == 404) {
-        // Course data nout found for given slug, use fallback "Course: slug"
-        return get_string("activity_prefix_course", 'selflearn') . $slug;
-    } else {
-        $data = json_decode($response, true);
-
-        if (json_last_error() != JSON_ERROR_NONE && !is_array($data)) {
-            $error_message = get_string('error_rest_api_blocked', 'selflearn');
-            $notification = new notification($error_message, notification::NOTIFY_ERROR);
-            echo $OUTPUT->render($notification);
-        } else {
-            return $data['title'];
-        }
-    }
-}
-
-// Unused?
-function selflearn_search_all_courses($title) {
-    GLOBAL $OUTPUT;
-    $lms_url = "https://staging.sse.uni-hildesheim.de:9011/skill-repositories";
-
-    $curl = new curl();
-    $search_params = [
-        'title' => $title,
-        'page' => 1,
-
-    ];
-    $data = json_encode($search_params);
-    $response = $curl->post($lms_url, $search_params);
-    $data = json_decode($response, true);
-
-    $courses = [];
-    if (json_last_error() != JSON_ERROR_NONE && !is_array($data)) {
-        $error_message = get_string('error_rest_api_blocked', 'selflearn');
-        $notification = new notification($error_message, notification::NOTIFY_ERROR);
-        echo $OUTPUT->render($notification);
-    } else {
-        foreach ($data["repositories"] as $course) {
-            $courses[] = [
-                'id' => $course['id'],
-                'name' => $course['name']
-            ];
-        }
-    }
-
-    echo $OUTPUT->render($response);
-
-    return $courses;
-}
 
 function selflearn_query_progress($users, $courses) {
     $studentScores = [];

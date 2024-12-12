@@ -1,6 +1,8 @@
 <?php
 $string['pluginname'] = 'SelfLearn';
 $string['modulename'] = 'SelfLearn';
+$string['admin::Selflearn_URL'] = 'SelfLearn URL';
+$string['admin::Selflearn_URL_Description'] = 'Root URL for the SelfLearn application';
 $string['modulenameplural'] = 'SelfLearn';
 $string['api_label_toggle_course_Selection'] = 'Search all courses';
 $string['api_label_course_selection'] = 'Select course';

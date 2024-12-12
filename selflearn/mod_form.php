@@ -2,7 +2,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once ($CFG->dirroot.'/course/moodleform_mod.php');
-require_once ('./lib.php');
+require_once(dirname(__FILE__) . '/rest_client.php');
 require_once(__DIR__.'/../../config.php');
 
 // use core\output\notification;
