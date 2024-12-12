@@ -45,4 +45,10 @@ class mod_selflearn_mod_form extends moodleform_mod {
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
     }
+
+    public function get_data(){
+        $data = parent::get_data();
+
+        return $data;
+    }
 }

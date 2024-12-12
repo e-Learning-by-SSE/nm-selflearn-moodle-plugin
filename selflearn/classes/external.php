@@ -15,7 +15,8 @@ class mod_selflearn_external extends external_api {
     }
 
     public static function search_items($search) {
-        return selflearn_list_courses(null, $search);
+        $courses = selflearn_list_courses(null, $search);
+        return $courses;
     }
 
     public static function search_items_returns() {

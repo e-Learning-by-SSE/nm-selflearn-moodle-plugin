@@ -21,6 +21,8 @@ define(['jquery', 'core/ajax'] , function ($, Ajax) {
                             text: course.name
                         }));
                     });
+
+                    course_select.value = data[0].id;
                 }).fail(function(error) {
                     window.console.log('AJAX request failed', error);
                 });
