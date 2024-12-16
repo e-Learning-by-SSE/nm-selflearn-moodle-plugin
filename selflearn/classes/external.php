@@ -7,7 +7,6 @@ require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->dirroot . '/mod/selflearn/rest_client.php');
 
 class mod_selflearn_external extends external_api {
-
     public static function search_items_parameters() {       
         return new external_function_parameters(
             array('search' => new external_value(PARAM_TEXT, 'Search query'))

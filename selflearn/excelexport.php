@@ -2,9 +2,6 @@
 require_once("../../config.php");
 
 require_login();
-// if (!has_capability('mod/selflearn:exportdata', context_system::instance())) {
-//     throw new required_capability_exception(context_system::instance(), 'mod/selflearn:exportdata', 'nopermission', '');
-// }
 
 $id = required_param('id', PARAM_INT); // Course Id.
 $cache = cache::make('mod_selflearn', 'report_cache');

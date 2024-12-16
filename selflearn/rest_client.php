@@ -20,7 +20,6 @@ const REST_API = "api/rest/";
  * only courses with the given string in the title are returned, independent of the author.
  */
 function selflearn_list_courses($userid, $title) {
-    GLOBAL $OUTPUT;
 
     $config = get_config('mod_selflearn');
     if (empty($config->selflearn_base_url)) {
@@ -46,12 +45,9 @@ function selflearn_list_courses($userid, $title) {
     $response = $curl->get($selflearn_courses, $search_params);
     $data = json_decode($response, true);
 
-
     $courses = [];
     if (json_last_error() != JSON_ERROR_NONE && !is_array($data)) {
-        $error_message = get_string('error_rest_api_blocked', 'selflearn');
-        $notification = new notification($error_message, notification::NOTIFY_ERROR);
-        echo $OUTPUT->render($notification);
+        throw new Exception("REST API Blocked");
     } else {
         foreach ($data["result"] as $course) {
             $courses[] = [
@@ -65,7 +61,6 @@ function selflearn_list_courses($userid, $title) {
 }
 
 function selflearn_get_course_title($slug) {
-    GLOBAL $OUTPUT;
 
     $config = get_config('mod_selflearn');
     if (empty($config->selflearn_base_url)) {
@@ -85,9 +80,7 @@ function selflearn_get_course_title($slug) {
         $data = json_decode($response, true);
 
         if (json_last_error() != JSON_ERROR_NONE && !is_array($data)) {
-            $error_message = get_string('error_rest_api_blocked', 'selflearn');
-            $notification = new notification($error_message, notification::NOTIFY_ERROR);
-            echo $OUTPUT->render($notification);
+            throw new Exception("REST API Blocked");
         } else {
             return $data['title'];
         }

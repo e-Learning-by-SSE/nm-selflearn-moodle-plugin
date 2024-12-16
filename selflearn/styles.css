@@ -71,3 +71,33 @@
     background-color: #f3f3f3;
     font-size: 0.9em;
 }
+
+/* .custom-switch {
+    appearance: none;
+    width: 60px;
+    height: 30px;
+    background: #ccc;
+    border-radius: 15px;
+    position: relative;
+    cursor: pointer;
+ }
+ 
+ .custom-switch:checked {
+    background: #4CAF50;
+ }
+ 
+ .custom-switch:before {
+    content: '';
+    width: 26px;
+    height: 26px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: 0.2s;
+ }
+ 
+ .custom-switch:checked:before {
+    left: 32px;
+ } */

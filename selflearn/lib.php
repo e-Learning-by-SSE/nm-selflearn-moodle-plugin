@@ -59,7 +59,12 @@ function selflearn_query_progress($users, $courses) {
  * @return int|bool true or the new id
  */
 function selflearn_add_instance($data) {
-    global $USER, $DB, $SELFLEARN_WEB_COURSE_URL;
+    global $USER, $DB;
+
+    $config = get_config('mod_selflearn');
+    if (empty($config->selflearn_base_url)) {
+        return false;
+    }
 
     // Prepare data to be saved to the database
     $course_slug = $data->course_selection;
@@ -67,8 +72,11 @@ function selflearn_add_instance($data) {
     $record->userid = $USER->id;
     $record->course = $data->course;
     $record->slug = $course_slug;
-    $record->url = $SELFLEARN_WEB_COURSE_URL . $course_slug;
+    $record->url = $config->selflearn_base_url . "courses/" . $course_slug;
     $record->name = selflearn_get_course_title($course_slug);
+    // Type: Course | Nano-Module | Skill
+    // Currently only Courses are supported
+    $record->type ="Course";
 
     // Insert the data into the selflearn_data table
     return $DB->insert_record('selflearn', $record);
@@ -95,9 +103,12 @@ function selflearn_delete_instance($id) {
 }
 
 function selflearn_update_instance($data, $mform) {
-    global $USER, $DB, $SELFLEARN_WEB_COURSE_URL;
+    global $USER, $DB;
 
-    error_log("UPDATE INSTANCE");
+    $config = get_config('mod_selflearn');
+    if (empty($config->selflearn_base_url)) {
+        return false;
+    }
 
     // Prepare data to be saved to the database
     $course_slug = $data->course_selection;
@@ -106,8 +117,11 @@ function selflearn_update_instance($data, $mform) {
     $record->userid = $USER->id;
     $record->course = $data->course;
     $record->slug = $course_slug;
-    $record->url = $SELFLEARN_WEB_COURSE_URL . $course_slug;
+    $record->url = $config->selflearn_base_url . "courses/" . $course_slug;
     $record->name = selflearn_get_course_title($course_slug);
+    // Type: Course | Nano-Module | Skill
+    // Currently only Courses are supported
+    $record->type = $data->type;
 
     // Update
     $DB->update_record('selflearn', $record);

@@ -7,6 +7,7 @@
     <TABLE NAME="selflearn" COMMENT="Defines an activity for students to complete a SelfLearn course (must be named as the plugin)">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Course | Nano-Module | Skill"/>
         <FIELD NAME="course" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the Moodle course, where to add the link to the SelfLearn course (must be named course)"/>
         <FIELD NAME="userid" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the teacher who defined the activity"/>
         <FIELD NAME="slug" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The slug of the selected SelfLearn course"/>
