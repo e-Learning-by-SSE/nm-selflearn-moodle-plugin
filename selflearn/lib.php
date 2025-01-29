@@ -9,10 +9,6 @@
  */
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/filelib.php');
-require_once(dirname(__FILE__) . '/rest_client.php');
-
-global $SELFLEARN_API_COURSE_DATA;
-$SELFLEARN_API_COURSE_DATA = $SELFLEARN_BASE_URL . "skill-repositories/byId/";
 
 global $SELFLEARN_WEB_COURSE_URL;
 $SELFLEARN_WEB_COURSE_URL = "https://www.uni-hildesheim.de/selflearn/courses/";
@@ -67,13 +63,14 @@ function selflearn_add_instance($data) {
     }
 
     // Prepare data to be saved to the database
+    $client = new restclient();
     $course_slug = $data->course_selection;
     $record = new stdClass();
     $record->userid = $USER->id;
     $record->course = $data->course;
     $record->slug = $course_slug;
     $record->url = $config->selflearn_base_url . "courses/" . $course_slug;
-    $record->name = selflearn_get_course_title($course_slug);
+    $record->name = $client->selflearn_get_course_title($course_slug);
     // Type: Course | Nano-Module | Skill
     // Currently only Courses are supported
     $record->type ="Course";
@@ -104,11 +101,11 @@ function selflearn_delete_instance($id) {
 
 function selflearn_update_instance($data, $mform) {
     global $USER, $DB;
-
     $config = get_config('mod_selflearn');
     if (empty($config->selflearn_base_url)) {
         return false;
     }
+    $client = new restclient();
 
     // Prepare data to be saved to the database
     $course_slug = $data->course_selection;
@@ -118,7 +115,7 @@ function selflearn_update_instance($data, $mform) {
     $record->course = $data->course;
     $record->slug = $course_slug;
     $record->url = $config->selflearn_base_url . "courses/" . $course_slug;
-    $record->name = selflearn_get_course_title($course_slug);
+    $record->name = $client->selflearn_get_course_title($course_slug);
     // Type: Course | Nano-Module | Skill
     // Currently only Courses are supported
     $record->type = $data->type;

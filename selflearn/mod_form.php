@@ -2,8 +2,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once ($CFG->dirroot.'/course/moodleform_mod.php');
-require_once(dirname(__FILE__) . '/rest_client.php');
 require_once(__DIR__.'/../../config.php');
+require_once(dirname(__FILE__) . '/classes/restclient.php');
 
 $PAGE->requires->js_call_amd('mod_selflearn/query_update', 'queryCourses');
 class mod_selflearn_mod_form extends moodleform_mod {
@@ -11,9 +11,10 @@ class mod_selflearn_mod_form extends moodleform_mod {
         global $USER, $OUTPUT;
         $username = $USER->username;
         $mform = $this->_form;
+        $client = new restclient();
         
         try {
-            $courses = selflearn_list_courses($username, null);
+            $courses = $client->selflearn_list_courses($username, null);
             $options = [];
             foreach ($courses as $item) {
                 $options[$item['id']] = $item['name'];
@@ -42,10 +43,17 @@ class mod_selflearn_mod_form extends moodleform_mod {
             $this->standard_coursemodule_elements();
             $this->add_action_buttons();
         } catch (Exception $e) {
-            $mform->addElement('html', $OUTPUT->notification(
-                get_string('error_rest_api_blocked', 'mod_selflearn'), 
-                \core\output\notification::NOTIFY_ERROR
-            ));
+            if ($e->getMessage() == "Server not reachable") {
+                $mform->addElement('html', $OUTPUT->notification(
+                    get_string('error::selflearn_not_reachable', 'mod_selflearn'), 
+                    \core\output\notification::NOTIFY_ERROR
+                ));
+            } else {
+                $mform->addElement('html', $OUTPUT->notification(
+                    get_string('error::rest_api_blocked', 'mod_selflearn'), 
+                    \core\output\notification::NOTIFY_ERROR
+                ));
+            }
 
             $this->standard_hidden_coursemodule_elements();
             $this->add_action_buttons(true, false, false);

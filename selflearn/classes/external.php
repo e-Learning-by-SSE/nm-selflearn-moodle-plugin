@@ -1,10 +1,13 @@
 <?php
+
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
+
+require_once('restclient.php');
+
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/filelib.php');
-require_once($CFG->dirroot . '/mod/selflearn/rest_client.php');
 
 class mod_selflearn_external extends external_api {
     public static function search_items_parameters() {       
@@ -14,7 +17,8 @@ class mod_selflearn_external extends external_api {
     }
 
     public static function search_items($search) {
-        $courses = selflearn_list_courses(null, $search);
+        $client = new restclient();
+        $courses = $client->selflearn_list_courses(null, $search);
         return $courses;
     }
 
