@@ -38,7 +38,7 @@ class restclient {
         //     throw new Exception("No OAuth2 service account configured");
         // }
         // Load OAuth2 client
-        $this->client = $api->get_user_oauth_client($issuer, $PAGE->url, "");
+        $this->client = $api->get_user_oauth_client($issuer, $PAGE->url, "", true);
         if (!$this->client->is_logged_in()) {
             print("Log in");
             redirect($this->client->get_login_url());
