@@ -50,7 +50,6 @@ class restclient {
         // if (!$this->client->is_logged_in()) {
         //     throw new Exception("OAuth2 service account disconnected");
         // }
-
     }
 
 

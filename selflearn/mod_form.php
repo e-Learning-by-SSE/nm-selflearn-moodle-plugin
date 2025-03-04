@@ -5,7 +5,8 @@ require_once ($CFG->dirroot.'/course/moodleform_mod.php');
 require_once(__DIR__.'/../../config.php');
 require_once(dirname(__FILE__) . '/classes/restclient.php');
 
-$PAGE->requires->js_call_amd('mod_selflearn/query_update', 'queryCourses');
+// $PAGE->requires->js_call_amd('mod_selflearn/query_update', 'queryCourses');
+$PAGE->requires->js_call_amd('mod_selflearn/update_courses', 'init');
 class mod_selflearn_mod_form extends moodleform_mod {
     public function definition() {
         global $USER, $OUTPUT;
@@ -45,10 +46,6 @@ class mod_selflearn_mod_form extends moodleform_mod {
             $div = '<div style="display: flex; align-items: center; gap: 10px;">'.$label.'<div class="custom-control custom-switch custom-switch">'.$togglehtml.'</div></div>';
             $mform->addElement('html', $div);
 
-            // Add a hidden element to store the value
-            $mform->addElement('hidden', 'toggle', 0);
-            $mform->setType('toggle', PARAM_INT);
-
             // $ajax_url = new moodle_url('/mod/selflearn/search.php');
             $mform->addElement('text', 'search_input', get_string('api_label_course_search', 'selflearn'), array(
                     'size' => '40',
@@ -64,9 +61,6 @@ class mod_selflearn_mod_form extends moodleform_mod {
 
             $this->standard_coursemodule_elements();
             $this->add_action_buttons();
-
-
-
         } catch (Exception $e) {
             if ($e->getMessage() == "Server not reachable") {
                 $mform->addElement('html', $OUTPUT->notification(
@@ -79,6 +73,8 @@ class mod_selflearn_mod_form extends moodleform_mod {
                     \core\output\notification::NOTIFY_ERROR
                 ));
             }
+
+            // $mform->addElement('html', '<script type="module">require([\'mod_selflearn/update_courses\'], function(mod) { mod.init(); });</script>');
 
             $this->standard_hidden_coursemodule_elements();
             $this->add_action_buttons(true, false, false);
