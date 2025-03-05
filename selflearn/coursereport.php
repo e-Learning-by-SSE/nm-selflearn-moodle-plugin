@@ -7,7 +7,7 @@
 
 // // Access + permissions.
 // $course = get_course($id);
-// // Verify the user has access to view the course
+// // Verify the user has access to view the coursle
 // require_login($id);
 
 // $context = context_course::instance($id);
