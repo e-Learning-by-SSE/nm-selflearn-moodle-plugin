@@ -1,6 +1,5 @@
 pipeline {
     agent { 
-        label 'docker'
         docker {
             image "${DOCKER_BUILD_IMAGE}"
             reuseNode true // This is important to enable the use of the docker socket for sidecar pattern later
