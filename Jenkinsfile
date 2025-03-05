@@ -5,7 +5,8 @@ pipeline {
     environment {
         PLUGIN_DIR = 'selflearn'
         BUILD_IMAGE = 'joshkeegan/zip:latest'
-        ARTIFACT_NAME = 'selflearn-moodle-plugin.zip'
+	TIMESTAMP = sh(script: 'date +"%Y-%m-%d"', returnStdout: true).trim()
+        ARTIFACT_NAME = "selflearn-moodle-plugin-${TIMESTAMP}.zip"
     }
     options {
         ansiColor('xterm')
