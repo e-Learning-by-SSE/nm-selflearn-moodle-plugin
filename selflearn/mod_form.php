@@ -62,19 +62,10 @@ class mod_selflearn_mod_form extends moodleform_mod {
             $this->standard_coursemodule_elements();
             $this->add_action_buttons();
         } catch (Exception $e) {
-            if ($e->getMessage() == "Server not reachable") {
-                $mform->addElement('html', $OUTPUT->notification(
-                    get_string('error::selflearn_not_reachable', 'mod_selflearn'), 
-                    \core\output\notification::NOTIFY_ERROR
-                ));
-            } else {
-                $mform->addElement('html', $OUTPUT->notification(
-                    get_string('error::rest_api_blocked', 'mod_selflearn'), 
-                    \core\output\notification::NOTIFY_ERROR
-                ));
-            }
-
-            // $mform->addElement('html', '<script type="module">require([\'mod_selflearn/update_courses\'], function(mod) { mod.init(); });</script>');
+            $mform->addElement('html', $OUTPUT->notification(
+                $e->getMessage(), 
+                \core\output\notification::NOTIFY_ERROR
+            ));
 
             $this->standard_hidden_coursemodule_elements();
             $this->add_action_buttons(true, false, false);

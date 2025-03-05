@@ -22,13 +22,13 @@ class restclient {
         $config = get_config('mod_selflearn');
         
         if (empty($config->selflearn_base_url)) {
-            throw new Exception("No SelfLearn Base URL configured");
+            throw new Exception(get_string("error::No SelfLearn Base URL configured", "mod_selflearn"));
         }
         $this->selflearn_rest_api = $config->selflearn_base_url . REST_API;
         
         // Load OAuth2 service, which is configured to be used with this plugin
         if (empty($config->selflearn_oauth2_provider)) {
-            throw new Exception("No OAuth2 provider configured");
+            throw new Exception(get_string("error::No OAuth2 provider configured", "mod_selflearn"));
         } 
 
         // Get sertvice account
@@ -52,6 +52,47 @@ class restclient {
         // }
     }
 
+    /**
+     * Uniform repsponse handling for REST API calls.
+     * Converts the response to a JSON object and checks for errors.
+     * @param string $response The response of the REST API call.
+     * @return array The associative array of the JSON response.
+     * @throws Exception If the response is not a valid JSON object or the REST API call was blocked for some reason.
+     */
+    private function handle_response(string $response) {
+        // Check if the server is reachable
+        if ($response == "Recv failure: Connection reset by peer") {
+            throw new Exception(get_string('error::selflearn_not_reachable', 'mod_selflearn'));
+        }
+        $data = json_decode($response, true);
+    
+        // Check for errors in the response
+        if (json_last_error() != JSON_ERROR_NONE && !is_array($data)) {
+            // Most likely the REST API is blocked by Moodle for security reasons
+            throw new Exception(get_string('error::rest_api_blocked_by_moodle', 'mod_selflearn'));
+        } else if ($data["code"] == "FORBIDDEN") {
+            if ($data["message"] == "Requires 'AUTHOR' role.") {
+                // Moodle user has not the required SelfLearn role to access the REST API
+                throw new Exception(get_string('error::wrong_role:author', 'mod_selflearn'));
+            } else {
+                // Unknown error
+                $message = get_string('error::rest_api_blocked', 'mod_selflearn');
+                throw new Exception(sprintf($message, $data["message"]));
+            }
+        } else if ($data["code"] == "UNAUTHORIZED") {
+            if ($data["message"] == "UNAUTHORIZED") {
+                // Moodle user has no SelfLearn account
+
+                throw new Exception(get_string('error::unauthorized_user', 'mod_selflearn'));
+            } else {
+                // Unknown error
+                $message = get_string('error::rest_api_blocked', 'mod_selflearn');
+                throw new Exception(sprintf($message, $data["message"]));
+            }
+        }
+
+        return $data;
+    }
 
     /**
      * Searches for courses to imports. Requires either `$userId` or `$title` to be set.
@@ -73,22 +114,16 @@ class restclient {
         if ($username != null) {
             $search_params['authorId'] = $username;
         }
+        
         $response = $this->client->get($selflearn_courses, $search_params);
-        if ($response == "Recv failure: Connection reset by peer") {
-            throw new Exception("Server not reachable");
-        }
-        $data = json_decode($response, true);
+        $data = $this->handle_response($response);
     
         $courses = [];
-        if (json_last_error() != JSON_ERROR_NONE && !is_array($data)) {
-            throw new Exception("REST API Blocked");
-        } else {
-            foreach ($data["result"] as $course) {
-                $courses[] = [
-                    'id' => $course['slug'],
-                    'name' => $course['title']
-                ];
-            }
+        foreach ($data["result"] as $course) {
+            $courses[] = [
+                'id' => $course['slug'],
+                'name' => $course['title']
+            ];
         }
     
         return $courses;

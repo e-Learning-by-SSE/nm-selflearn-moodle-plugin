@@ -16,10 +16,11 @@ $string['report::title'] = 'SelfLearn Aktivitätsbericht';
 $string['report::first_name'] = 'Vorname';
 $string['report::last_name'] = 'Nachname';
 $string['report::export_btn'] = 'Export';
-$string['error::rest_api_blocked'] = 'Fehler: SelfLearn REST API durch Moodle blockiert, dieses Problem kann nur durch einen Admin behoben werden.';
+$string['error::rest_api_blocked_by_moodle'] = 'Fehler: SelfLearn REST API durch Moodle blockiert, dieses Problem kann nur durch einen Admin behoben werden.';
+$string['error::rest_api_blocked'] = 'Fehler: Verbindung zu SelfLearn REST API blockiert. Ursache: {reason}';
+$string['error::wrong_role:author'] = 'Fehler: Für die angeforderte Aktion benötigen Sie die Rolle "Author" in der SelfLearn-Platform.';
+$string['error::unauthorized_user'] = 'Fehler: Sie benötigen einen SelfLearn Account für die angeforderte Aktion. Bitte loggen Sie sich in der SelfLearn-Plattform ein bevor Sie fortfahren.';
 $string['error::selflearn_not_reachable'] = 'Fehler: SelfLearn Plattform ist nichr erreichbar, dieses Problem kann nur durch einen Admin behoben werden.';
-$string['No SelfLearn Base URL configured'] = 'Fehler: SelfLearn Plattform URL unbekannt, dieses Problem kann nur durch einen Admin behoben werden.';
-$string['No OAuth2 provider configured'] = 'Fehler: Es wurde kein SelfLearn Authentifizierungsdienst konfiguriert, dieses Problem kann nur durch einen Admin behoben werden.';
-$string['No OAuth2 service account configured'] = 'Fehler: Es wurde kein SelfLearn Service-Account konfiguriert, dieses Problem kann nur durch einen Admin behoben werden.';
-$string['OAuth2 service account disconnected'] = 'Fehler: Die Verbindung zum Selflearn Service-Account wurde getrennt, dieses Problem kann nur durch einen Admin behoben werden.';
+$string['error::No SelfLearn Base URL configured'] = 'Fehler: SelfLearn Plattform URL unbekannt, dieses Problem kann nur durch einen Admin behoben werden.';
+$string['error::No OAuth2 provider configured'] = 'Fehler: Es wurde kein SelfLearn Authentifizierungsdienst konfiguriert, dieses Problem kann nur durch einen Admin behoben werden.';
 ?>
