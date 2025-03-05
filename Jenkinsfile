@@ -4,9 +4,8 @@ pipeline {
     }
     environment {
         PLUGIN_DIR = 'selflearn'
-        ARTIFACT_NAME = 'moodle-plugin.zip'
-        DOCKER_BUILD_IMAGE = 'moodlehq/moodle-php-apache:8.2'
-        MOODLE_DOWNLOAD_URL = 'https://download.moodle.org/download.php/direct/stable405/moodle-latest-405.tgz'
+        DOCKER_BUILD_IMAGE = 'alpine:latest'
+        ARTIFACT_NAME = 'selflearn-moodle-plugin.zip'
     }
     options {
         ansiColor('xterm')
@@ -20,19 +19,14 @@ pipeline {
                     reuseNode true // This is important to enable the use of the docker socket for sidecar pattern later
                 }
             }
-            environment {
-                NPM_TOKEN = credentials('GitHub-NPM')
-            }
             steps {
-                sh "wget -O moodle.tgz ${MOODLE_DOWNLOAD_URL}"
-                sh 'tar -xzf moodle.tgz -C /var/www/html'
-                sh 'rm moodle.tgz'
+                sh "apk add --no-cache zip"
             }
         }
         
         stage('Package Plugin') {
             steps {
-                sh "zip -r ${ARTIFACT_NAME} ${PLUGIN_DIR}"
+                sh "zip -r ${ARTIFACT_NAME} ${env.WORKSPACE}/selflearn"
             }
         }
         
