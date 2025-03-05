@@ -4,7 +4,7 @@ pipeline {
     }
     environment {
         PLUGIN_DIR = 'selflearn'
-        DOCKER_BUILD_IMAGE = 'alpine:latest'
+        DOCKER_BUILD_IMAGE = 'joshkeegan/zip:latest'
         ARTIFACT_NAME = 'selflearn-moodle-plugin.zip'
     }
     options {
@@ -18,9 +18,6 @@ pipeline {
                     image "${DOCKER_BUILD_IMAGE}"
                     reuseNode true // This is important to enable the use of the docker socket for sidecar pattern later
                 }
-            }
-            steps {
-                sh "apk add --no-cache zip"
             }
         }
         
