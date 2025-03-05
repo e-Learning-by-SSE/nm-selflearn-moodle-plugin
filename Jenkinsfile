@@ -5,7 +5,7 @@ pipeline {
     environment {
         PLUGIN_DIR = 'selflearn'
         ARTIFACT_NAME = 'moodle-plugin.zip'
-        DOCKER_ARGS = "--tmpfs"
+        DOCKER_ARGS = ""
         DOCKER_BUILD_IMAGE = 'moodlehq/moodle-php-apache:8.2'
         MOODLE_DOWNLOAD_URL = 'https://download.moodle.org/download.php/direct/stable405/moodle-latest-405.tgz'
     }
