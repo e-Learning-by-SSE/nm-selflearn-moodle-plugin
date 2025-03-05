@@ -140,13 +140,8 @@ class restclient {
             // Course data not found for given slug, use fallback "Course: slug"
             return get_string("activity_prefix_course", 'selflearn') . $slug;
         } else {
-            $data = json_decode($response, true);
-    
-            if (json_last_error() != JSON_ERROR_NONE && !is_array($data)) {
-                throw new Exception("REST API Blocked");
-            } else {
-                return $data['title'];
-            }
+            $data = $this->handle_response($response);
+            return $data['title'];
         }
     }
 }

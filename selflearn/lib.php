@@ -126,19 +126,19 @@ function selflearn_update_instance($data, $mform) {
     return true;
 }
 
-/**
- * 
- *
- * @param settings_navigation $navigation The settings navigation object
- * @param stdClass $course The course
- * @param $context Course context
- * @return void
- */
-function mod_selflearn_extend_navigation_course($navigation, $course, $context): void {  
-    if (has_capability('mod/selflearn:viewgrades', $context)) {
-        $url = new moodle_url('/mod/selflearn/coursereport.php', ['id' => $course->id]);
-        $settingsnode = navigation_node::create(get_string('report::title', 'selflearn'), $url, navigation_node::TYPE_SETTING,
-            null, 'selflearn', new pix_icon('i/selflearn', ''));
-        $navigation->add_node($settingsnode);
-    }
-}
+// /**
+//  * 
+//  *
+//  * @param settings_navigation $navigation The settings navigation object
+//  * @param stdClass $course The course
+//  * @param $context Course context
+//  * @return void
+//  */
+// function mod_selflearn_extend_navigation_course($navigation, $course, $context): void {  
+//     if (has_capability('mod/selflearn:viewgrades', $context)) {
+//         $url = new moodle_url('/mod/selflearn/coursereport.php', ['id' => $course->id]);
+//         $settingsnode = navigation_node::create(get_string('report::title', 'selflearn'), $url, navigation_node::TYPE_SETTING,
+//             null, 'selflearn', new pix_icon('i/selflearn', ''));
+//         $navigation->add_node($settingsnode);
+//     }
+// }
