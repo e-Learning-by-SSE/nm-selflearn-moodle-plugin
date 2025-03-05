@@ -4,37 +4,24 @@ pipeline {
     }
     environment {
         PLUGIN_DIR = 'selflearn'
-        ARTIFACT_NAME = 'moodle-plugin.zip'
-        DOCKER_ARGS = "--tmpfs"
-        DOCKER_BUILD_IMAGE = 'moodlehq/moodle-php-apache:8.2'
-        MOODLE_DOWNLOAD_URL = 'https://download.moodle.org/download.php/direct/stable405/moodle-latest-405.tgz'
+        BUILD_IMAGE = 'joshkeegan/zip:latest'
+	TIMESTAMP = sh(script: 'date +"%Y-%m-%d"', returnStdout: true).trim()
+        ARTIFACT_NAME = "selflearn-moodle-plugin-${TIMESTAMP}.zip"
     }
     options {
         ansiColor('xterm')
     }
 
-    stages {
-        stage('Build Container') {
-            agent {
-                docker {
-                    image "${DOCKER_BUILD_IMAGE}"
-                    args "${DOCKER_ARGS}"
-                    reuseNode true // This is important to enable the use of the docker socket for sidecar pattern later
-                }
-            }
-            environment {
-                NPM_TOKEN = credentials('GitHub-NPM')
-            }
-            steps {
-                sh "wget -O moodle.tgz ${MOODLE_DOWNLOAD_URL}"
-                sh 'tar -xzf moodle.tgz -C /var/www/html'
-                sh 'rm moodle.tgz'
-            }
-        }
-        
+    stages {        
         stage('Package Plugin') {
+		    agent {
+                docker {
+		            image "${BUILD_IMAGE}" 
+                    reuseNode true
+		        }
+            }
             steps {
-                sh "zip -r ${ARTIFACT_NAME} ${PLUGIN_DIR}"
+                sh "cd ${env.WORKSPACE} && zip -r ${ARTIFACT_NAME} selflearn"
             }
         }
         
@@ -45,4 +32,3 @@ pipeline {
         }
     }
 }
-
