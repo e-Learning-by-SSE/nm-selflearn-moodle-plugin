@@ -42,8 +42,9 @@ class restclient {
         //     throw new Exception("No OAuth2 service account configured");
         // }
         // Load OAuth2 client
-        debugging('SelfLearn: REST Client(Constructor) - Get Client, Return URL: ' . $PAGE->url, DEBUG_DEVELOPER);
-        $this->client = $api->get_user_oauth_client($issuer, $PAGE->url, "", true);
+        $return_url = new moodle_url($PAGE->url);
+        debugging('SelfLearn: REST Client(Constructor) - Get Client, Return URL: ' . $return_url, DEBUG_DEVELOPER);
+        $this->client = $api->get_user_oauth_client($issuer, $return_url, "", true);
         if (!$this->client->is_logged_in()) {
             debugging('SelfLearn: REST Client(Constructor) - Performing OAuth Login', DEBUG_DEVELOPER);
             redirect($this->client->get_login_url());
