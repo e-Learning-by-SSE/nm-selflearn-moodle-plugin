@@ -19,11 +19,13 @@ class restclient {
 
     function __construct() {
         global $PAGE;
+        debugging('SelfLearn: REST Client(Constrcutor) - Start', DEBUG_DEVELOPER);
         $config = get_config('mod_selflearn');
         
         if (empty($config->selflearn_base_url)) {
             throw new Exception(get_string("error::No SelfLearn Base URL configured", "mod_selflearn"));
         }
+        debugging('SelfLearn: REST Client(Constrcutor) - BASE URL configured', DEBUG_DEVELOPER);
         $this->selflearn_rest_api = $config->selflearn_base_url . REST_API;
         
         // Load OAuth2 service, which is configured to be used with this plugin
@@ -32,14 +34,18 @@ class restclient {
         } 
 
         // Get sertvice account
+        debugging('SelfLearn: REST Client(Constrcutor) - INIT API', DEBUG_DEVELOPER);
         $api = new api();
+        debugging('SelfLearn: REST Client(Constrcutor) - Load Issuer', DEBUG_DEVELOPER);
         $issuer = $api->get_issuer($config->selflearn_oauth2_provider);
         // if (!$issuer->is_system_account_connected()) {
         //     throw new Exception("No OAuth2 service account configured");
         // }
         // Load OAuth2 client
+        debugging('SelfLearn: REST Client(Constrcutor) - Get Client', DEBUG_DEVELOPER);
         $this->client = $api->get_user_oauth_client($issuer, $PAGE->url, "", true);
         if (!$this->client->is_logged_in()) {
+            debugging('SelfLearn: REST Client(Constrcutor) - Performing OAuth Login', DEBUG_DEVELOPER);
             print("Log in");
             redirect($this->client->get_login_url());
         }
@@ -101,6 +107,7 @@ class restclient {
      * only courses with the given string in the title are returned, independent of the author.
      */
     function selflearn_list_courses($username, $title) {
+        debugging('SelfLearn: REST Client(List Courses) - Init', DEBUG_DEVELOPER);
         $selflearn_courses = $this->selflearn_rest_api ."courses/";
     
         $search_params = [
@@ -115,8 +122,11 @@ class restclient {
             $search_params['authorId'] = $username;
         }
         
+        debugging('SelfLearn: REST Client(List Courses) - Before Get', DEBUG_DEVELOPER);
         $response = $this->client->get($selflearn_courses, $search_params);
+        debugging('SelfLearn: REST Client(List Courses) - After Get', DEBUG_DEVELOPER);
         $data = $this->handle_response($response);
+        debugging('SelfLearn: REST Client(List Courses) - Response parsed', DEBUG_DEVELOPER);
     
         $courses = [];
         foreach ($data["result"] as $course) {
@@ -126,6 +136,7 @@ class restclient {
             ];
         }
     
+        debugging('SelfLearn: REST Client(List Courses) - Return parsed data', DEBUG_DEVELOPER);
         return $courses;
     }
     

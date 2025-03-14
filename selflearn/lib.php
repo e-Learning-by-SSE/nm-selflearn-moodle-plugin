@@ -10,9 +10,6 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/filelib.php');
 
-global $SELFLEARN_WEB_COURSE_URL;
-$SELFLEARN_WEB_COURSE_URL = "https://www.uni-hildesheim.de/selflearn/courses/";
-
 function selflearn_query_progress($users, $courses) {
     $studentScores = [];
 
@@ -50,19 +47,22 @@ function selflearn_query_progress($users, $courses) {
  *
  * @global object $USER The creating teacher
  * @global object $DB The database object
- * @global object $SELFLEARN_WEB_COURSE_URL Base URL for accessing courses by their slug
  * @param object $data The data from the form
  * @return int|bool true or the new id
  */
 function selflearn_add_instance($data) {
     global $USER, $DB;
 
+    debugging('SelfLearn: Add Activity - Start', DEBUG_DEVELOPER);
     $config = get_config('mod_selflearn');
     if (empty($config->selflearn_base_url)) {
+        debugging('SelfLearn: Add Activity - No Config -> Abort', DEBUG_DEVELOPER);
         return false;
     }
 
     // Prepare data to be saved to the database
+    
+    debugging('SelfLearn: Add Activity - Load REST Client', DEBUG_DEVELOPER);
     $client = new restclient();
     $course_slug = $data->course_selection;
     $record = new stdClass();
@@ -70,12 +70,14 @@ function selflearn_add_instance($data) {
     $record->course = $data->course;
     $record->slug = $course_slug;
     $record->url = $config->selflearn_base_url . "courses/" . $course_slug;
+    debugging('SelfLearn: Add Activity - REST to load title for course:' . $course_slug, DEBUG_DEVELOPER);
     $record->name = $client->selflearn_get_course_title($course_slug);
     // Type: Course | Nano-Module | Skill
     // Currently only Courses are supported
     $record->type ="Course";
 
     // Insert the data into the selflearn_data table
+    debugging('SelfLearn: Add Activity - Insert into DB' . $course_slug, DEBUG_DEVELOPER);
     return $DB->insert_record('selflearn', $record);
 }
 

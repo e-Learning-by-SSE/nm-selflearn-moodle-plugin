@@ -10,8 +10,10 @@ $PAGE->requires->js_call_amd('mod_selflearn/update_courses', 'init');
 class mod_selflearn_mod_form extends moodleform_mod {
     public function definition() {
         global $USER, $OUTPUT;
+        debugging('SelfLearn: Add Form - Construtor Start', DEBUG_DEVELOPER);
         $username = $USER->username;
         $mform = $this->_form;
+        debugging('SelfLearn: Add Form - Consructor before REST Client', DEBUG_DEVELOPER);
         $client = new restclient();
         
         try {
