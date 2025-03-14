@@ -19,13 +19,13 @@ class restclient {
 
     function __construct() {
         global $PAGE;
-        debugging('SelfLearn: REST Client(Constrcutor) - Start', DEBUG_DEVELOPER);
+        debugging('SelfLearn: REST Client(Constructor) - Start', DEBUG_DEVELOPER);
         $config = get_config('mod_selflearn');
         
         if (empty($config->selflearn_base_url)) {
             throw new Exception(get_string("error::No SelfLearn Base URL configured", "mod_selflearn"));
         }
-        debugging('SelfLearn: REST Client(Constrcutor) - BASE URL configured', DEBUG_DEVELOPER);
+        debugging('SelfLearn: REST Client(Constructor) - BASE URL configured', DEBUG_DEVELOPER);
         $this->selflearn_rest_api = $config->selflearn_base_url . REST_API;
         
         // Load OAuth2 service, which is configured to be used with this plugin
@@ -34,19 +34,18 @@ class restclient {
         } 
 
         // Get sertvice account
-        debugging('SelfLearn: REST Client(Constrcutor) - INIT API', DEBUG_DEVELOPER);
+        debugging('SelfLearn: REST Client(Constructor) - INIT API', DEBUG_DEVELOPER);
         $api = new api();
-        debugging('SelfLearn: REST Client(Constrcutor) - Load Issuer', DEBUG_DEVELOPER);
+        debugging('SelfLearn: REST Client(Constructor) - Load Issuer', DEBUG_DEVELOPER);
         $issuer = $api->get_issuer($config->selflearn_oauth2_provider);
         // if (!$issuer->is_system_account_connected()) {
         //     throw new Exception("No OAuth2 service account configured");
         // }
         // Load OAuth2 client
-        debugging('SelfLearn: REST Client(Constrcutor) - Get Client', DEBUG_DEVELOPER);
+        debugging('SelfLearn: REST Client(Constructor) - Get Client, Return URL: ' . $PAGE->url, DEBUG_DEVELOPER);
         $this->client = $api->get_user_oauth_client($issuer, $PAGE->url, "", true);
         if (!$this->client->is_logged_in()) {
-            debugging('SelfLearn: REST Client(Constrcutor) - Performing OAuth Login', DEBUG_DEVELOPER);
-            print("Log in");
+            debugging('SelfLearn: REST Client(Constructor) - Performing OAuth Login', DEBUG_DEVELOPER);
             redirect($this->client->get_login_url());
         }
 
