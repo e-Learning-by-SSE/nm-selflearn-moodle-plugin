@@ -139,7 +139,7 @@ function mod_selflearn_extend_navigation_course($navigation, $course, $context):
             $authoring_url = new moodle_url($config->selflearn_base_url . "dashboard/author");
 
             $settingsnode = navigation_node::create(get_string('menu::authoring_page_label', 'selflearn'), $authoring_url, navigation_node::TYPE_CUSTOM,
-                null, 'selflearn_authoring_page', new pix_icon('selflearn', 'Self Learn', 'mod_selflearn'));
+                null, 'selflearn_authoring_page', new pix_icon('monologo', '', 'mod_selflearn'));
             $navigation->add_node($settingsnode);
         }
 
