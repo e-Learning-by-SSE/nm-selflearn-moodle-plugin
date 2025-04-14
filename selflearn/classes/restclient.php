@@ -43,6 +43,9 @@ class restclient {
         // }
         // Load OAuth2 client
         $return_url = $PAGE->url->out_as_local_url(false);
+        echo htmlspecialchars($return_url->out(false));
+        $return_url = str_replace("§ion", "section", $return_url);
+        echo htmlspecialchars($return_url->out(false));
         $url = new moodle_url('/admin/oauth2callback.php', [
             'state' => $return_url
         ]);
