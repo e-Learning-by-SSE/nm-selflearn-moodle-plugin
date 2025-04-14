@@ -48,8 +48,12 @@ class restclient {
             'sesskey' => sesskey(),
             'response_type' => 'code'
         ]);
+        $url2 = new moodle_url('/admin/oauth2callback.php', [
+            'sesskey' => sesskey(),
+        ])->out_as_local_url(false);
+
         debugging('SelfLearn: REST Client(Constructor) - Get Client, Return URL: ' . $return_url . " - Full Return URL: " . $url, DEBUG_DEVELOPER);
-        $this->client = $api->get_user_oauth_client($issuer, $url, "", true);
+        $this->client = $api->get_user_oauth_client($issuer, $url2, "", true);
         if (!$this->client->is_logged_in()) {
             debugging('SelfLearn: REST Client(Constructor) - Performing OAuth Login', DEBUG_DEVELOPER);
             debugging('SelfLearn: REST Client(Constructor) - Login URL: ' . $this->client->get_login_url(), DEBUG_DEVELOPER);
