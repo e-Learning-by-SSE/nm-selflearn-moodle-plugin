@@ -53,16 +53,12 @@ function selflearn_query_progress($users, $courses) {
 function selflearn_add_instance($data) {
     global $USER, $DB;
 
-    debugging('SelfLearn: Add Activity - Start', DEBUG_DEVELOPER);
     $config = get_config('mod_selflearn');
     if (empty($config->selflearn_base_url)) {
-        debugging('SelfLearn: Add Activity - No Config -> Abort', DEBUG_DEVELOPER);
         return false;
     }
 
     // Prepare data to be saved to the database
-    
-    debugging('SelfLearn: Add Activity - Load REST Client', DEBUG_DEVELOPER);
     $client = new restclient();
     $course_slug = $data->course_selection;
     $record = new stdClass();
@@ -70,14 +66,12 @@ function selflearn_add_instance($data) {
     $record->course = $data->course;
     $record->slug = $course_slug;
     $record->url = $config->selflearn_base_url . "courses/" . $course_slug;
-    debugging('SelfLearn: Add Activity - REST to load title for course:' . $course_slug, DEBUG_DEVELOPER);
     $record->name = $client->selflearn_get_course_title($course_slug);
     // Type: Course | Nano-Module | Skill
     // Currently only Courses are supported
     $record->type ="Course";
 
     // Insert the data into the selflearn_data table
-    debugging('SelfLearn: Add Activity - Insert into DB' . $course_slug, DEBUG_DEVELOPER);
     return $DB->insert_record('selflearn', $record);
 }
 
@@ -128,19 +122,30 @@ function selflearn_update_instance($data, $mform) {
     return true;
 }
 
-// /**
-//  * 
-//  *
-//  * @param settings_navigation $navigation The settings navigation object
-//  * @param stdClass $course The course
-//  * @param $context Course context
-//  * @return void
-//  */
-// function mod_selflearn_extend_navigation_course($navigation, $course, $context): void {  
-//     if (has_capability('mod/selflearn:viewgrades', $context)) {
-//         $url = new moodle_url('/mod/selflearn/coursereport.php', ['id' => $course->id]);
-//         $settingsnode = navigation_node::create(get_string('report::title', 'selflearn'), $url, navigation_node::TYPE_SETTING,
-//             null, 'selflearn', new pix_icon('i/selflearn', ''));
-//         $navigation->add_node($settingsnode);
-//     }
-// }
+/**
+ * Adds menu entries to the course navigation for the SelfLearn module:
+ * - Authoring page
+ * - Progress report of students (up comming)
+ * @param settings_navigation $navigation The settings navigation object
+ * @param stdClass $course The course
+ * @param $context Course context
+ * @return void
+ */
+function mod_selflearn_extend_navigation_course($navigation, $course, $context): void {  
+    if (has_capability('mod/selflearn:viewgrades', $context)) {
+        // SelfLearn authoring page
+        $config = get_config('mod_selflearn');
+        if (!empty($config->selflearn_base_url)) {
+            $authoring_url = $config->selflearn_base_url . "dashboard/author";
+            $settingsnode = navigation_node::create(get_string('menu::authoring_page_label', 'selflearn'), $authoring_url, navigation_node::TYPE_SETTING,
+                null, 'selflearn', new pix_icon('i/selflearn', ''));
+            $navigation->add_node($settingsnode);
+        }
+
+        // // Progress report of students
+        // $report_page = new moodle_url('/mod/selflearn/coursereport.php', ['id' => $course->id]);
+        // $settingsnode = navigation_node::create(get_string('report::title', 'selflearn'), $report_page, navigation_node::TYPE_SETTING,
+        //     null, 'selflearn', new pix_icon('i/selflearn', ''));
+        // $navigation->add_node($settingsnode);
+    }
+}

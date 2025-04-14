@@ -1,7 +1,7 @@
 <?php
 defined('MOODLE_INTERNAL') || die;
 
-const DEFAULT_SELFLEARN_URL = 'http://147.172.178.48:4201/';
+const DEFAULT_SELFLEARN_URL = 'https://www.uni-hildesheim.de/selflearn/';
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext(

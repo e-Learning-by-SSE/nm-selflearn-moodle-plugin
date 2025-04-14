@@ -19,13 +19,12 @@ class restclient {
 
     function __construct() {
         global $PAGE;
-        debugging('SelfLearn: REST Client(Constructor) - Start', DEBUG_DEVELOPER);
+        // debugging('SelfLearn: REST Client(Constructor) - Start', DEBUG_DEVELOPER);
         $config = get_config('mod_selflearn');
         
         if (empty($config->selflearn_base_url)) {
             throw new Exception(get_string("error::No SelfLearn Base URL configured", "mod_selflearn"));
         }
-        debugging('SelfLearn: REST Client(Constructor) - BASE URL configured', DEBUG_DEVELOPER);
         $this->selflearn_rest_api = $config->selflearn_base_url . REST_API;
         
         // Load OAuth2 service, which is configured to be used with this plugin
@@ -34,39 +33,20 @@ class restclient {
         } 
 
         // Get sertvice account
-        debugging('SelfLearn: REST Client(Constructor) - INIT API', DEBUG_DEVELOPER);
         $api = new api();
-        debugging('SelfLearn: REST Client(Constructor) - Load Issuer', DEBUG_DEVELOPER);
         $issuer = $api->get_issuer($config->selflearn_oauth2_provider);
-        // if (!$issuer->is_system_account_connected()) {
-        //     throw new Exception("No OAuth2 service account configured");
-        // }
+
         // Load OAuth2 client
-        $return_url = $PAGE->url->out_as_local_url(false);
-        $url = new moodle_url('/admin/oauth2callback.php', [
-            'state' => $return_url,
-            'sesskey' => sesskey(),
-            'response_type' => 'code'
-        ]);
-        $url2 = new moodle_url($return_url, [
-            'state' => $return_url,
+        $current_page = $PAGE->url->out_as_local_url(false);
+        $return_uri = new moodle_url($current_page, [
+            'state' => $current_page,
             'sesskey' => sesskey(),
         ]);
 
-        debugging('SelfLearn: REST Client(Constructor) - Get Client, Return URL: ' . $return_url . " - Full Return URL: " . $url, DEBUG_DEVELOPER);
-        $this->client = $api->get_user_oauth_client($issuer, $url2, "", true);
+        $this->client = $api->get_user_oauth_client($issuer, $return_uri, "", true);
         if (!$this->client->is_logged_in()) {
-            debugging('SelfLearn: REST Client(Constructor) - Performing OAuth Login', DEBUG_DEVELOPER);
-            debugging('SelfLearn: REST Client(Constructor) - Login URL: ' . $this->client->get_login_url(), DEBUG_DEVELOPER);
             redirect($this->client->get_login_url());
         }
-
-        // $t = $this->client->request_token();
-        // print("Token: " . $this->client->get_accesstoken());
-        // $this->client = api::get_system_oauth_client($issuer);
-        // if (!$this->client->is_logged_in()) {
-        //     throw new Exception("OAuth2 service account disconnected");
-        // }
     }
 
     /**
@@ -118,12 +98,12 @@ class restclient {
      * only courses with the given string in the title are returned, independent of the author.
      */
     function selflearn_list_courses($username, $title) {
-        debugging('SelfLearn: REST Client(List Courses) - Init', DEBUG_DEVELOPER);
         $selflearn_courses = $this->selflearn_rest_api ."courses/";
     
         $search_params = [
             'page' => 1,
         ];
+        
         // Search by title
         if ($title != null) {
             $search_params['title'] = $title;
@@ -133,11 +113,8 @@ class restclient {
             $search_params['authorId'] = $username;
         }
         
-        debugging('SelfLearn: REST Client(List Courses) - Before Get', DEBUG_DEVELOPER);
         $response = $this->client->get($selflearn_courses, $search_params);
-        debugging('SelfLearn: REST Client(List Courses) - After Get', DEBUG_DEVELOPER);
         $data = $this->handle_response($response);
-        debugging('SelfLearn: REST Client(List Courses) - Response parsed', DEBUG_DEVELOPER);
     
         $courses = [];
         foreach ($data["result"] as $course) {
@@ -147,7 +124,6 @@ class restclient {
             ];
         }
     
-        debugging('SelfLearn: REST Client(List Courses) - Return parsed data', DEBUG_DEVELOPER);
         return $courses;
     }
     

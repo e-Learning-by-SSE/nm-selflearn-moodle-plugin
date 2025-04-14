@@ -6,6 +6,7 @@ $string['admin::Selflearn_URL'] = 'SelfLearn URL';
 $string['admin::Selflearn_URL_Description'] = 'Root URL for the SelfLearn application';
 $string['admin::selflearn_oauth2_provider'] = 'OAuth2 Service-Account of the SelfLearn application (e.g., provided by Keycloak)';
 $string['admin::selflearn_oauth2_provider_Description'] = 'A service account is required for REST API calls';
+$string['menu::authoring_page_label'] = 'SelfLearn - Authoring Area';
 $string['api_label_toggle_course_Selection'] = 'Search all courses';
 $string['api_label_course_selection'] = 'Select course';
 $string['api_label_course_search'] = 'Course title';
