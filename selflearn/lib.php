@@ -136,9 +136,10 @@ function mod_selflearn_extend_navigation_course($navigation, $course, $context):
         // SelfLearn authoring page
         $config = get_config('mod_selflearn');
         if (!empty($config->selflearn_base_url)) {
-            $authoring_url = $config->selflearn_base_url . "dashboard/author";
+            $authoring_url = new action_url($config->selflearn_base_url . "dashboard/author");
+
             $settingsnode = navigation_node::create(get_string('menu::authoring_page_label', 'selflearn'), $authoring_url, navigation_node::TYPE_SETTING,
-                null, 'selflearn', new pix_icon('i/selflearn', ''));
+                null, 'selflearn', new pix_icon('selflearn', 'Self Learn', 'mod_selflearn'));
             $navigation->add_node($settingsnode);
         }
 

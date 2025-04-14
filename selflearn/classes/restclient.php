@@ -67,7 +67,7 @@ class restclient {
         if (json_last_error() != JSON_ERROR_NONE && !is_array($data)) {
             // Most likely the REST API is blocked by Moodle for security reasons
             throw new Exception(get_string('error::rest_api_blocked_by_moodle', 'mod_selflearn'));
-        } else if ($data["code"] == "FORBIDDEN") {
+        } else if (isset($data["code"]) &&  $data["code"] == "FORBIDDEN") {
             if ($data["message"] == "Requires 'AUTHOR' role.") {
                 // Moodle user has not the required SelfLearn role to access the REST API
                 throw new Exception(get_string('error::wrong_role:author', 'mod_selflearn'));
@@ -76,7 +76,7 @@ class restclient {
                 $message = get_string('error::rest_api_blocked', 'mod_selflearn');
                 throw new Exception(sprintf($message, $data["message"]));
             }
-        } else if ($data["code"] == "UNAUTHORIZED") {
+        } else if (isset($data["code"]) && $data["code"] == "UNAUTHORIZED") {
             if ($data["message"] == "UNAUTHORIZED") {
                 // Moodle user has no SelfLearn account
 
