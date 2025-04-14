@@ -43,11 +43,9 @@ class restclient {
         // }
         // Load OAuth2 client
         $return_url = $PAGE->url->out_as_local_url(false);
-        echo htmlspecialchars($return_url);
-        $return_url = str_replace("§ion", "section", $return_url);
-        echo htmlspecialchars($return_url);
         $url = new moodle_url('/admin/oauth2callback.php', [
-            'state' => $return_url
+            'state' => $return_url,
+            'sesskey' => sesskey(),
         ]);
         debugging('SelfLearn: REST Client(Constructor) - Get Client, Return URL: ' . $return_url . " - Full Return URL: " . $url, DEBUG_DEVELOPER);
         $this->client = $api->get_user_oauth_client($issuer, $url, "", true);
