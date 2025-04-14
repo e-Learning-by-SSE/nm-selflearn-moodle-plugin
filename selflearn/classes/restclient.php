@@ -48,7 +48,8 @@ class restclient {
             'sesskey' => sesskey(),
             'response_type' => 'code'
         ]);
-        $url2 = new moodle_url('/admin/oauth2callback.php', [
+        $url2 = new moodle_url($return_url, [
+            'state' => $return_url,
             'sesskey' => sesskey(),
         ]);
 
