@@ -46,6 +46,7 @@ class restclient {
         $url = new moodle_url('/admin/oauth2callback.php', [
             'state' => $return_url,
             'sesskey' => sesskey(),
+            'response_type' => 'code'
         ]);
         debugging('SelfLearn: REST Client(Constructor) - Get Client, Return URL: ' . $return_url . " - Full Return URL: " . $url, DEBUG_DEVELOPER);
         $this->client = $api->get_user_oauth_client($issuer, $url, "", true);
