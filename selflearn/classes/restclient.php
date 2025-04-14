@@ -42,7 +42,7 @@ class restclient {
         //     throw new Exception("No OAuth2 service account configured");
         // }
         // Load OAuth2 client
-        $return_url = new moodle_url($PAGE->url);
+        $return_url = (new moodle_url($PAGE->url))->out(false);
         $url = new moodle_url('/admin/oauth2callback.php', [
             'state' => $return_url
         ]);
