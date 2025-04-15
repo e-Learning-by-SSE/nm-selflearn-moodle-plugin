@@ -2,7 +2,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
     return {
         init: function() {
             const toggle = $('#toggle');
-            const toggleState = toggle.prop('checked') ? 1 : 0;
+            const toggleState = toggle.prop('checked') ? 0 : 1;
             const searchInput = $('input[name="search_input"]');
             var searchText = "" + searchInput.val();
 
@@ -15,7 +15,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
              */
             function updateCourses() {
                 let searchQuery = searchInput.val();
-                let toggleState = toggle.prop('checked') ? 1 : 0;
+                let toggleState = toggle.prop('checked') ? 0 : 1;
                 window.console.log('Search: ' + searchQuery, "Authors: " + toggleState);
 
                 var request = Ajax.call([{
