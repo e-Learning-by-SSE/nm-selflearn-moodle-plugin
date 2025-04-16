@@ -15,6 +15,7 @@ const REST_API = "api/rest/";
 
 class restclient {
     private $client;
+    private $selflearn_website;
     private $selflearn_rest_api;
 
     function __construct() {
@@ -25,6 +26,7 @@ class restclient {
         if (empty($config->selflearn_base_url)) {
             throw new Exception(get_string("error::No SelfLearn Base URL configured", "mod_selflearn"));
         }
+        $this->selflearn_website = $config->selflearn_base_url;
         $this->selflearn_rest_api = $config->selflearn_base_url . REST_API;
         
         // Load OAuth2 service, which is configured to be used with this plugin
@@ -79,8 +81,10 @@ class restclient {
         } else if (isset($data["code"]) && $data["code"] == "UNAUTHORIZED") {
             if ($data["message"] == "UNAUTHORIZED") {
                 // Moodle user has no SelfLearn account
-
-                throw new Exception(get_string('error::unauthorized_user', 'mod_selflearn'));
+                $url = new moodle_url($this->selflearn_website);
+                $link = html_writer::link($url, 'Link', ['target' => '_blank']);
+                $msg = get_string('error::unauthorized_user', 'mod_selflearn', (object)['link' => $link]);
+                throw new Exception($msg);
             } else {
                 // Unknown error
                 $message = get_string('error::rest_api_blocked', 'mod_selflearn');
