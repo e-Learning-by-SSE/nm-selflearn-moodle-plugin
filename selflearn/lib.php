@@ -114,7 +114,8 @@ function selflearn_update_instance($data, $mform) {
     $record->name = $client->selflearn_get_course_title($course_slug);
     // Type: Course | Nano-Module | Skill
     // Currently only Courses are supported
-    $record->type = $data->type;
+    // Only form data is passed (not DB data) -> Type is currently hardcoded
+    $record->type ="Course";
 
     // Update
     $DB->update_record('selflearn', $record);

@@ -2,6 +2,7 @@
 $string['pluginname'] = 'SelfLearn';
 $string['modulename'] = 'SelfLearn';
 $string['modulenameplural'] = 'SelfLearn';
+$string['pluginadministration'] = 'SelfLearn Administration';
 $string['admin::Selflearn_URL'] = 'SelfLearn URL';
 $string['admin::Selflearn_URL_Description'] = 'Root URL for the SelfLearn application. Must end with a slash (e.g., https://www.uni-hildesheim.de/selflearn/)';
 $string['admin::selflearn_oauth2_provider'] = 'OAuth2 Service-Account of the SelfLearn application (e.g., provided by Keycloak)';
