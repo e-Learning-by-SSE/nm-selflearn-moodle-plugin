@@ -133,7 +133,7 @@ function selflearn_update_instance($data, $mform) {
  * @return void
  */
 function mod_selflearn_extend_navigation_course($navigation, $course, $context): void {  
-    if (has_capability('mod/selflearn:viewgrades', $context)) {
+    if (has_capability('mod/selflearn:viewgrades', context_course::instance($course->id))) {
         // SelfLearn authoring page
         $config = get_config('mod_selflearn');
         if (!empty($config->selflearn_base_url)) {
