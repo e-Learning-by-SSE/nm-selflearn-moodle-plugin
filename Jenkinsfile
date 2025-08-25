@@ -20,7 +20,7 @@ pipeline {
                 }
             }
             steps {
-                sh "cd ${env.WORKSPACE} && zip -r ${ARTIFACT_NAME} . -x 'Jenkinsfile'"
+                sh "cd ${env.WORKSPACE} && zip -r ${ARTIFACT_NAME} . -x 'Jenkinsfile' '.git'"
             }
         }
         
