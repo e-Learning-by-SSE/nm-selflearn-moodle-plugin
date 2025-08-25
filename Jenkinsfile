@@ -3,9 +3,8 @@ pipeline {
         label 'docker'
     }
     environment {
-        PLUGIN_DIR = 'selflearn'
         BUILD_IMAGE = 'joshkeegan/zip:latest'
-	TIMESTAMP = sh(script: 'date +"%Y-%m-%d"', returnStdout: true).trim()
+        TIMESTAMP = sh(script: 'date +"%Y-%m-%d"', returnStdout: true).trim()
         ARTIFACT_NAME = "selflearn-moodle-plugin-${TIMESTAMP}.zip"
     }
     options {
@@ -14,14 +13,14 @@ pipeline {
 
     stages {        
         stage('Package Plugin') {
-		    agent {
+            agent {
                 docker {
-		            image "${BUILD_IMAGE}" 
+                    image "${BUILD_IMAGE}" 
                     reuseNode true
-		        }
+                }
             }
             steps {
-                sh "cd ${env.WORKSPACE} && zip -r ${ARTIFACT_NAME} selflearn"
+                sh "cd ${env.WORKSPACE} && zip -r ${ARTIFACT_NAME} . -x 'Jenkinsfile'"
             }
         }
         
