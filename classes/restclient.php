@@ -133,17 +133,41 @@ class restclient {
     
     function selflearn_get_course_title($slug) {
         $lms_url = $this->selflearn_rest_api . "courses/" . $slug;
-    
+
         // Query
         $response = $this->client->get($lms_url);
         $http_status = $this->client->get_info()['http_code'];
-        
+
         if ($http_status == 404) {
             // Course data not found for given slug, use fallback "Course: slug"
             return get_string("activity_prefix_course", 'selflearn') . $slug;
         } else {
             $data = $this->handle_response($response);
             return $data['title'];
+        }
+    }
+
+    /**
+     * Get course progress for multiple students
+     * @param string $slug Course slug
+     * @param array $usernames Array of student usernames
+     * @return array Array of progress data with username and progress percentage
+     */
+    function selflearn_get_course_progress($slug, $usernames) {
+        $progress_url = $this->selflearn_rest_api . "courses/" . $slug . "/progress";
+
+        $params = [];
+        if (!empty($usernames)) {
+            $params['usernames'] = implode(',', $usernames);
+        }
+
+        try {
+            $response = $this->client->get($progress_url, $params);
+            return $this->handle_response($response);
+        } catch (Exception $e) {
+            // Log the error and return empty array
+            error_log("SelfLearn API Error: " . $e->getMessage());
+            return [];
         }
     }
 }

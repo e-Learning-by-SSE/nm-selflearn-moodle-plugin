@@ -18,7 +18,7 @@ function export_csv($data) {
     fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
     
     // Add headers to the CSV
-    $header = array_merge([get_string("report::first_name", "selflearn"), get_string("report::last_name", "selflearn")], $data->courses, ['Σ']);
+    $header = array_merge([get_string("report::first_name", "selflearn"), get_string("report::last_name", "selflearn"), 'Username'], $data->courses, ['Average']);
     fputcsv($output, $header, ";");
     
     foreach ($data->data as $row) {

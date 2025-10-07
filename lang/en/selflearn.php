@@ -31,4 +31,25 @@ $string['error::unauthorized_user'] = 'Fehler: You need a SelfLearn account. Ple
 $string['error::selflearn_not_reachable'] = 'Error: SelfLearn platform not reachable, please contact an administrator.';
 $string['error::No SelfLearn Base URL configured'] = 'Error: SelfLearn URL unknown, please contact an administrator.';
 $string['error::No OAuth2 provider configured'] = 'Error: No SelfLearn Auth provider configuered, please contact an administrator.';
+
+// New strings for course report
+$string['report::refresh_data'] = 'Refresh Data';
+$string['report::last_updated'] = 'Last Updated:';
+$string['report::cache_info'] = 'Progress data is cached for performance. Click "Refresh Data" to get the latest information.';
+$string['report::total_students'] = 'Total Students';
+$string['report::enrolled_students'] = 'Enrolled';
+$string['report::average_progress'] = 'Average Progress';
+$string['report::activities_count'] = 'Activities';
+$string['report::search_placeholder'] = 'Search by name or username';
+$string['report::no_results'] = 'No students found matching your search criteria.';
+$string['report::username'] = 'Username';
+$string['report::average'] = 'Average';
+$string['report::showing_entries'] = 'Showing {$a->start}–{$a->end} of {$a->total} students';
+$string['report::previous'] = 'Previous';
+$string['report::next'] = 'Next';
+$string['report::legend_title'] = 'Progress Legend';
+$string['report::legend_excellent'] = '80% and above — Excellent';
+$string['report::legend_good'] = '60–79% — Good Progress';
+$string['report::legend_needs_improvement'] = '0–59% — Needs Improvement';
+$string['report::legend_not_enrolled'] = 'Not enrolled in course';
 ?>

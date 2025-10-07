@@ -31,4 +31,25 @@ $string['error::unauthorized_user'] = 'Fehler: Sie benötigen einen SelfLearn Ac
 $string['error::selflearn_not_reachable'] = 'Fehler: SelfLearn Plattform ist nichr erreichbar, dieses Problem kann nur durch einen Admin behoben werden.';
 $string['error::No SelfLearn Base URL configured'] = 'Fehler: SelfLearn Plattform URL unbekannt, dieses Problem kann nur durch einen Admin behoben werden.';
 $string['error::No OAuth2 provider configured'] = 'Fehler: Es wurde kein SelfLearn Authentifizierungsdienst konfiguriert, dieses Problem kann nur durch einen Admin behoben werden.';
+
+// New strings for course report
+$string['report::refresh_data'] = 'Daten aktualisieren';
+$string['report::last_updated'] = 'Zuletzt aktualisiert:';
+$string['report::cache_info'] = 'Die Fortschrittsdaten werden aus Performance-Gründen zwischengespeichert. Klicken Sie auf "Daten aktualisieren", um die neuesten Informationen zu erhalten.';
+$string['report::total_students'] = 'Studierende insgesamt';
+$string['report::enrolled_students'] = 'Eingeschrieben';
+$string['report::average_progress'] = 'Durchschnittlicher Fortschritt';
+$string['report::activities_count'] = 'Aktivitäten';
+$string['report::search_placeholder'] = 'Nach Name oder Benutzername suchen';
+$string['report::no_results'] = 'Keine Studierenden gefunden, die den Suchkriterien entsprechen.';
+$string['report::username'] = 'Benutzername';
+$string['report::average'] = 'Durchschnitt';
+$string['report::showing_entries'] = 'Zeige {$a->start}–{$a->end} von {$a->total} Studierenden';
+$string['report::previous'] = 'Zurück';
+$string['report::next'] = 'Weiter';
+$string['report::legend_title'] = 'Fortschrittslegende';
+$string['report::legend_excellent'] = '80% und mehr — Ausgezeichnet';
+$string['report::legend_good'] = '60–79% — Guter Fortschritt';
+$string['report::legend_needs_improvement'] = '0–59% — Verbesserungsbedarf';
+$string['report::legend_not_enrolled'] = 'Nicht im Kurs eingeschrieben';
 ?>
