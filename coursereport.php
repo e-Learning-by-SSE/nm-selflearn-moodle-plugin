@@ -1,6 +1,6 @@
 <?php
 /**
- * SelfLearn Progress Report - Minimalistic Professional Design
+ * SelfLearn Progress Report - Production Version
  * Shows detailed progress overview for all students in SelfLearn activities
  *
  * @package   selflearn
@@ -45,6 +45,7 @@ $modulename = 'selflearn';
 global $DB;
 $courses = [];
 $instances = [];
+
 foreach ($modinfo->get_instances_of($modulename) as $cm) {
     if ($cm->uservisible) {
         $info = $DB->get_record('selflearn', ['id' => $cm->instance]);
@@ -61,6 +62,7 @@ foreach ($modinfo->get_instances_of($modulename) as $cm) {
 // Get students
 $studentRoleId = 5;
 $students = [];
+
 foreach ($enrolled_users as $user) {
     if (user_has_role_assignment($user->id, $studentRoleId, $context->id)) {
         $student = new stdClass();
@@ -107,7 +109,7 @@ if ($data === false || $refresh) {
                 if ($value === null || $value === false || $value === "---") {                    
                     $combined[] = '---';
                 } else {
-                    $combined[] = intval($value);
+                    $combined[] = floatval($value);
                 }
             } else {
                 $combined[] = '---';
@@ -116,7 +118,7 @@ if ($data === false || $refresh) {
 
         if (isset($progress[$user->username]['total_average'])) {
             $avg = $progress[$user->username]['total_average'];
-            $combined[] = ($avg !== null && $avg !== false) ? intval($avg) : '---';
+            $combined[] = ($avg !== null && $avg !== false) ? floatval($avg) : '---';
         } else {
             $combined[] = '---';
         }
@@ -157,8 +159,8 @@ usort($filtered, function($a, $b) use ($sortby, $sortorder) {
         return $sortorder == 'ASC' ? strcmp($a[$index], $b[$index]) : strcmp($b[$index], $a[$index]);
     }
 
-    $aVal = ($a[$index] === '---' || $a[$index] === 'N/A') ? -1 : intval($a[$index]);
-    $bVal = ($b[$index] === '---' || $b[$index] === 'N/A') ? -1 : intval($b[$index]);
+    $aVal = ($a[$index] === '---' || $a[$index] === 'N/A') ? -1 : floatval($a[$index]);
+    $bVal = ($b[$index] === '---' || $b[$index] === 'N/A') ? -1 : floatval($b[$index]);
 
     return $sortorder == 'ASC' ? $aVal <=> $bVal : $bVal <=> $aVal;
 });
@@ -182,7 +184,7 @@ foreach ($filtered as $entry) {
     for ($i = 3; $i < count($entry) - 1; $i++) {
         if ($entry[$i] !== '---' && $entry[$i] !== 'N/A') {
             $has_any_enrollment = true;
-            $progress_value = intval($entry[$i]);
+            $progress_value = floatval($entry[$i]);
             $total_progress += $progress_value;
             $progress_count++;
         }
@@ -221,7 +223,7 @@ echo $OUTPUT->heading($pagetitle);
 // Last updated info
 if (isset($data->last_updated)) {
     $last_updated = userdate($data->last_updated, get_string('strftimerecent'));
-    echo '<div class="alert-info">';
+    echo '<div class="alert alert-info alert-block fade in">';
     echo '<p><strong>' . get_string('report::last_updated', 'selflearn') . '</strong> ' . $last_updated . '</p>';
     echo '<p>' . get_string('report::cache_info', 'selflearn') . '</p>';
     echo '</div>';
@@ -230,43 +232,51 @@ if (isset($data->last_updated)) {
 echo '<div class="report-wrapper">';
 
 // Top Statistics Bar
-echo '<div class="top-stats-bar">';
+echo '<div class="report-stats-grid">';
 
-echo '<div class="stat-box">';
-echo '<div class="stat-box-label">' . get_string('report::total_students', 'selflearn') . '</div>';
-echo '<div class="stat-box-value">' . $total_students . '</div>';
+echo '<div class="card report-stat-card">';
+echo '<div class="card-body">';
+echo '<div class="report-stat-label text-muted">' . get_string('report::total_students', 'selflearn') . '</div>';
+echo '<div class="report-stat-value">' . $total_students . '</div>';
+echo '</div>';
 echo '</div>';
 
-echo '<div class="stat-box">';
-echo '<div class="stat-box-label">' . get_string('report::enrolled_students', 'selflearn') . '</div>';
-echo '<div class="stat-box-value">' . $enrolled_students . '</div>';
+echo '<div class="card report-stat-card">';
+echo '<div class="card-body">';
+echo '<div class="report-stat-label text-muted">' . get_string('report::enrolled_students', 'selflearn') . '</div>';
+echo '<div class="report-stat-value">' . $enrolled_students . '</div>';
+echo '</div>';
 echo '</div>';
 
-echo '<div class="stat-box">';
-echo '<div class="stat-box-label">' . get_string('report::average_progress', 'selflearn') . '</div>';
-echo '<div class="stat-box-value">' . $avg_progress . '%</div>';
+echo '<div class="card report-stat-card">';
+echo '<div class="card-body">';
+echo '<div class="report-stat-label text-muted">' . get_string('report::average_progress', 'selflearn') . '</div>';
+echo '<div class="report-stat-value">' . number_format($avg_progress, 1) . '%</div>';
+echo '</div>';
 echo '</div>';
 
-echo '<div class="stat-box">';
-echo '<div class="stat-box-label">' . get_string('report::activities_count', 'selflearn') . '</div>';
-echo '<div class="stat-box-value">' . count($instances) . '</div>';
+echo '<div class="card report-stat-card">';
+echo '<div class="card-body">';
+echo '<div class="report-stat-label text-muted">' . get_string('report::activities_count', 'selflearn') . '</div>';
+echo '<div class="report-stat-value">' . count($instances) . '</div>';
+echo '</div>';
 echo '</div>';
 
 echo '</div>';
 
 // Controls Section
-echo '<div class="controls-section">';
+echo '<div class="report-controls">';
 
-echo '<div class="search-container">';
-echo '<form method="get" action="' . $pageurl->out_omit_querystring() . '">';
+echo '<div class="report-search">';
+echo '<form method="get" action="' . $pageurl->out_omit_querystring() . '" class="form-inline">';
 echo '<input type="hidden" name="id" value="' . $id . '">';
 echo '<input type="hidden" name="sortby" value="' . $sortby . '">';
 echo '<input type="hidden" name="sortorder" value="' . $sortorder . '">';
-echo '<input type="text" name="search" class="search-input" placeholder="' . get_string('report::search_placeholder', 'selflearn') . '" value="' . s($search) . '">';
+echo '<input type="text" name="search" class="form-control w-100" placeholder="' . get_string('report::search_placeholder', 'selflearn') . '" value="' . s($search) . '">';
 echo '</form>';
 echo '</div>';
 
-echo '<div class="action-buttons">';
+echo '<div class="report-actions">';
 $refreshurl = new moodle_url('/mod/selflearn/coursereport.php', ['id' => $id, 'refresh' => 1]);
 echo html_writer::link($refreshurl, get_string('report::refresh_data', 'selflearn'), ['class' => 'btn btn-secondary']);
 $exporturl = new moodle_url('/mod/selflearn/excelexport.php', ['id' => $id]);
@@ -277,14 +287,13 @@ echo '</div>';
 
 // Progress table
 if (empty($paginated_data)) {
-    echo '<div class="no-results">';
+    echo '<div class="alert alert-warning text-center" role="alert">';
     echo '<p>' . get_string('report::no_results', 'selflearn') . '</p>';
     echo '</div>';
 } else {
-    echo '<div class="table-container">';
     echo '<div class="table-responsive">';
-    echo '<table class="table selflearn_table">';
-    echo '<thead>';
+    echo '<table class="table table-striped table-hover generaltable">';
+    echo '<thead class="thead-dark">';
     echo '<tr>';
 
     $baseParams = ['id' => $id, 'page' => $page, 'perpage' => $perpage, 'search' => $search, 'sortorder' => $nextsortorder];
@@ -329,14 +338,14 @@ if (empty($paginated_data)) {
                 if ($value === '---' || $value === 'N/A') {
                     echo '<td class="text-muted"><em>' . $value . '</em></td>';
                 } else {
-                    $percentage = intval($value);
+                    $percentage = floatval($value);
                     $class = '';
                     if ($percentage >= 80) $class = 'text-success';
                     elseif ($percentage >= 60) $class = 'text-warning';
                     elseif ($percentage >= 0) $class = 'text-danger';
                     else $class = 'text-muted';
 
-                    echo '<td class="' . $class . '"><strong>' . $percentage . '%</strong></td>';
+                    echo '<td class="' . $class . '"><strong>' . number_format($percentage, 1) . '%</strong></td>';
                 }
             } else {
                 echo '<td>' . htmlspecialchars($value) . '</td>';
@@ -348,32 +357,32 @@ if (empty($paginated_data)) {
     echo '</tbody>';
     echo '</table>';
     echo '</div>';
-    echo '</div>';
 
     // Bottom Section: Pagination + Legend
-    echo '<div class="bottom-section">';
+    echo '<div class="report-bottom-layout">';
     
     // Pagination
     echo '<div class="pagination-wrapper">';
     
     if ($total_pages > 1) {
-        echo '<div class="pagination-container">';
+        echo '<div class="d-flex justify-content-between align-items-center my-3">';
         
         $start = $offset + 1;
         $end = min($offset + $perpage, $total_records);
-        echo '<div class="pagination-info">';
+        echo '<div class="report-pagination-info text-muted">';
         echo get_string('report::showing_entries', 'selflearn', ['start' => $start, 'end' => $end, 'total' => $total_records]);
         echo '</div>';
         
-        echo '<ul class="pagination">';
+        echo '<nav aria-label="Page navigation">';
+        echo '<ul class="pagination mb-0">';
         
         $paginationParams = ['id' => $id, 'sortby' => $sortby, 'sortorder' => $sortorder, 'perpage' => $perpage, 'search' => $search];
         
         if ($page > 1) {
             $prevUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($paginationParams, ['page' => ($page - 1)]));
-            echo '<li><a href="' . $prevUrl . '">' . get_string('report::previous', 'selflearn') . '</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="' . $prevUrl . '">' . get_string('report::previous', 'selflearn') . '</a></li>';
         } else {
-            echo '<li class="disabled"><span>' . get_string('report::previous', 'selflearn') . '</span></li>';
+            echo '<li class="page-item disabled"><span class="page-link">' . get_string('report::previous', 'selflearn') . '</span></li>';
         }
         
         $start_page = max(1, $page - 2);
@@ -381,51 +390,54 @@ if (empty($paginated_data)) {
         
         if ($start_page > 1) {
             $firstUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($paginationParams, ['page' => 1]));
-            echo '<li><a href="' . $firstUrl . '">1</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="' . $firstUrl . '">1</a></li>';
             if ($start_page > 2) {
-                echo '<li class="disabled"><span>...</span></li>';
+                echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
             }
         }
         
         for ($i = $start_page; $i <= $end_page; $i++) {
             $pageNumUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($paginationParams, ['page' => $i]));
             if ($i == $page) {
-                echo '<li class="active"><span>' . $i . '</span></li>';
+                echo '<li class="page-item active"><span class="page-link">' . $i . '</span></li>';
             } else {
-                echo '<li><a href="' . $pageNumUrl . '">' . $i . '</a></li>';
+                echo '<li class="page-item"><a class="page-link" href="' . $pageNumUrl . '">' . $i . '</a></li>';
             }
         }
         
         if ($end_page < $total_pages) {
             if ($end_page < $total_pages - 1) {
-                echo '<li class="disabled"><span>...</span></li>';
+                echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
             }
             $lastUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($paginationParams, ['page' => $total_pages]));
-            echo '<li><a href="' . $lastUrl . '">' . $total_pages . '</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="' . $lastUrl . '">' . $total_pages . '</a></li>';
         }
         
         if ($page < $total_pages) {
             $nextUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($paginationParams, ['page' => ($page + 1)]));
-            echo '<li><a href="' . $nextUrl . '">' . get_string('report::next', 'selflearn') . '</a></li>';
+            echo '<li class="page-item"><a class="page-link" href="' . $nextUrl . '">' . get_string('report::next', 'selflearn') . '</a></li>';
         } else {
-            echo '<li class="disabled"><span>' . get_string('report::next', 'selflearn') . '</span></li>';
+            echo '<li class="page-item disabled"><span class="page-link">' . get_string('report::next', 'selflearn') . '</span></li>';
         }
         
         echo '</ul>';
+        echo '</nav>';
         echo '</div>';
     }
     
     echo '</div>';
     
     // Legend
-    echo '<div class="legend-card">';
+    echo '<div class="card report-legend">';
+    echo '<div class="card-body">';
     echo '<h5>' . get_string('report::legend_title', 'selflearn') . '</h5>';
-    echo '<ul>';
+    echo '<ul class="list-unstyled mb-0">';
     echo '<li>' . get_string('report::legend_excellent', 'selflearn') . '</li>';
     echo '<li>' . get_string('report::legend_good', 'selflearn') . '</li>';
     echo '<li>' . get_string('report::legend_needs_improvement', 'selflearn') . '</li>';
     echo '<li>' . get_string('report::legend_not_enrolled', 'selflearn') . '</li>';
     echo '</ul>';
+    echo '</div>';
     echo '</div>';
     
     echo '</div>';
