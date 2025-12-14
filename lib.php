@@ -11,20 +11,21 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/filelib.php');
 require_once(__DIR__ . '/classes/restclient.php');
 
-function selflearn_query_progress($users, $courses) {
+function selflearn_query_progress($users, $courses, $restclient = null) {
     $studentScores = [];
 
     if (empty($users) || empty($courses)) {
         return $studentScores;
     }
 
-    // Create REST client
-    try {
-        $restclient = new restclient();
-    } catch (Exception $e) {
-        // If we can't create REST client, return default scores
-        error_log("SelfLearn: Cannot create REST client - " . $e->getMessage());
-        return selflearn_get_fallback_progress($users, $courses);
+    // Create REST client (for testing)
+    if ($restclient === null) {
+        try {
+            $restclient = new restclient();
+        } catch (Exception $e) {
+            error_log("SelfLearn: Cannot create REST client - " . $e->getMessage());
+            return selflearn_get_fallback_progress($users, $courses);
+        }
     }
 
     // Extract usernames for API call
