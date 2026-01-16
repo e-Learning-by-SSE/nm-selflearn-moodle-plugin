@@ -24,19 +24,27 @@ class restclient {
         $config = get_config('mod_selflearn');
         
         if (empty($config->selflearn_base_url)) {
-            throw new Exception(get_string("error::No SelfLearn Base URL configured", "mod_selflearn"));
+            throw new Exception(get_string("error::No_SelfLearn_Base_URL_configured", "mod_selflearn"));
         }
         $this->selflearn_website = $config->selflearn_base_url;
         $this->selflearn_rest_api = $config->selflearn_base_url . REST_API;
         
         // Load OAuth2 service, which is configured to be used with this plugin
         if (empty($config->selflearn_oauth2_provider)) {
-            throw new Exception(get_string("error::No OAuth2 provider configured", "mod_selflearn"));
+            error_log("SelfLearn: No OAuth2 provider configured.");
+            throw new Exception(get_string("error::No_OAuth2_provider_configured", "mod_selflearn"));
         } 
 
         // Get sertvice account
         $api = new api();
-        $issuer = $api->get_issuer($config->selflearn_oauth2_provider);
+        try {
+            $issuer = $api->get_issuer($config->selflearn_oauth2_provider);
+        } catch (moodle_exception $e) {
+            // Will throw dml_missing_record_exception, if issuer was not found
+            // or invalid/outdated provider was selected
+            error_log("SelfLearn: Wrong (probably non-existend) OAuth2 provider configured, with id = {$config->selflearn_oauth2_provider}");
+            throw new Exception(get_string("error::OAuth2_misconfigured", "mod_selflearn"));
+        }
 
         // Load OAuth2 client
         $current_page = $PAGE->url->out_as_local_url(false);

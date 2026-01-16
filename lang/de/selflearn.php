@@ -29,8 +29,9 @@ $string['error::rest_api_blocked'] = 'Fehler: Verbindung zu SelfLearn REST API b
 $string['error::wrong_role:author'] = 'Fehler: Für die angeforderte Aktion benötigen Sie die Rolle "Author" in der SelfLearn-Platform.';
 $string['error::unauthorized_user'] = 'Fehler: Sie benötigen einen SelfLearn Account für die angeforderte Aktion. Loggen Sie sich einmalig in der SelfLearn-Plattform ({$a->link}) ein, um fortzufahren.';
 $string['error::selflearn_not_reachable'] = 'Fehler: SelfLearn Plattform ist nichr erreichbar, dieses Problem kann nur durch einen Admin behoben werden.';
-$string['error::No SelfLearn Base URL configured'] = 'Fehler: SelfLearn Plattform URL unbekannt, dieses Problem kann nur durch einen Admin behoben werden.';
-$string['error::No OAuth2 provider configured'] = 'Fehler: Es wurde kein SelfLearn Authentifizierungsdienst konfiguriert, dieses Problem kann nur durch einen Admin behoben werden.';
+$string['error::No_SelfLearn_Base_URL_configured'] = 'Fehler: SelfLearn Plattform URL unbekannt, dieses Problem kann nur durch einen Admin behoben werden.';
+$string['error::No_OAuth2_provider_configured'] = 'Fehler: Es wurde kein SelfLearn Authentifizierungsdienst konfiguriert, dieses Problem kann nur durch einen Admin behoben werden.';
+$string['error::OAuth2_misconfigured'] = 'Fehler: Der SelfLearn Authentifizierungsdienst wurde fehlerhaft konfiguriert, dieses Problem kann nur durch einen Admin behoben werden.';
 
 // New strings for course report
 $string['report::refresh_data'] = 'Daten aktualisieren';
