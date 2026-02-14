@@ -53,4 +53,11 @@ $string['report::legend_excellent'] = '80% und mehr — Ausgezeichnet';
 $string['report::legend_good'] = '60–79% — Guter Fortschritt';
 $string['report::legend_needs_improvement'] = '0–59% — Verbesserungsbedarf';
 $string['report::legend_not_enrolled'] = 'Nicht im Kurs eingeschrieben';
+$string['report::legend_not_author'] = 'N/A — Kein Autor in SelfLearn';
+
+
+$string['report::selflearn_unavailable_title'] = 'SelfLearn-Plattform nicht erreichbar';
+$string['report::selflearn_unavailable_message'] = 'Die SelfLearn-Plattform ist derzeit nicht erreichbar. Es können keine Fortschrittsdaten angezeigt werden. Bitte versuchen Sie es später erneut.';
+$string['report::selflearn_error_title'] = 'SelfLearn-Berichtsfehler';
+$string['report::selflearn_error_message'] = 'Die Fortschrittsdaten konnten nicht von der SelfLearn-Plattform abgerufen werden. Dies kann daran liegen, dass Sie kein Autorenkonto auf SelfLearn haben oder die Verbindung blockiert wurde. Bitte versuchen Sie es erneut.';
 ?>

@@ -32,23 +32,19 @@ class integration_test extends \advanced_testcase {
      * Test 1.1: API returns progress for enrolled student
      */
     public function test_api_returns_progress_for_enrolled_student() {
-        // Create mock REST client
+        // Setup
         $mock_client = $this->createMock(\restclient::class);
-        
-        // Mock API response: student enrolled with 85% progress
         $mock_client->method('selflearn_get_course_progress')
             ->willReturn([
                 ['username' => 'student1', 'progress' => 85]
             ]);
-
-        // Create test data
         $users = [(object)['username' => 'student1']];
         $courses = [['slug' => 'test-course', 'id' => 1]];
 
-        // Call function with mock client
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
-        // Assertions
+        // Verify
         $this->assertArrayHasKey('student1', $result);
         $this->assertEquals(85, $result['student1']['test-course']);
         $this->assertEquals(85, $result['student1']['total_average']);
@@ -58,18 +54,17 @@ class integration_test extends \advanced_testcase {
      * Test 1.2: API returns empty array for non-enrolled student
      */
     public function test_api_returns_empty_for_not_enrolled() {
+        // Setup
         $mock_client = $this->createMock(\restclient::class);
-        
-        // Mock API response: empty array = not enrolled
         $mock_client->method('selflearn_get_course_progress')
             ->willReturn([]);
-
         $users = [(object)['username' => 'student1']];
         $courses = [['slug' => 'test-course', 'id' => 1]];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
-        // Assertions
+        // Verify
         $this->assertArrayHasKey('student1', $result);
         $this->assertEquals('---', $result['student1']['test-course']);
         $this->assertEquals('---', $result['student1']['total_average']);
@@ -79,20 +74,19 @@ class integration_test extends \advanced_testcase {
      * Test 1.3: API returns 0% progress (enrolled but no progress)
      */
     public function test_api_returns_zero_percent_progress() {
+        // Setup
         $mock_client = $this->createMock(\restclient::class);
-        
-        // Mock API response: 0% progress (enrolled but not started)
         $mock_client->method('selflearn_get_course_progress')
             ->willReturn([
                 ['username' => 'student1', 'progress' => 0]
             ]);
-
         $users = [(object)['username' => 'student1']];
         $courses = [['slug' => 'test-course', 'id' => 1]];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
-        // Assertions - 0% should be treated as enrolled with 0 progress
+        // Verify
         $this->assertArrayHasKey('student1', $result);
         $this->assertEquals(0, $result['student1']['test-course']);
         $this->assertEquals(0, $result['student1']['total_average']);
@@ -102,9 +96,8 @@ class integration_test extends \advanced_testcase {
      * Test 1.4: Multiple students with different progress
      */
     public function test_multiple_students_different_progress() {
+        // Setup
         $mock_client = $this->createMock(\restclient::class);
-        
-        // Mock API responses for different students
         $mock_client->method('selflearn_get_course_progress')
             ->willReturnCallback(function($slug, $usernames) {
                 $username = $usernames[0];
@@ -118,7 +111,6 @@ class integration_test extends \advanced_testcase {
                 }
                 return [];
             });
-
         $users = [
             (object)['username' => 'student1'],
             (object)['username' => 'student2'],
@@ -126,9 +118,10 @@ class integration_test extends \advanced_testcase {
         ];
         $courses = [['slug' => 'test-course', 'id' => 1]];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
-        // Assertions
+        // Verify
         $this->assertEquals(85, $result['student1']['test-course']);
         $this->assertEquals(50, $result['student2']['test-course']);
         $this->assertEquals('---', $result['student3']['test-course']);
@@ -138,9 +131,8 @@ class integration_test extends \advanced_testcase {
      * Test 1.5: Multiple courses with different progress
      */
     public function test_multiple_courses_different_progress() {
+        // Setup
         $mock_client = $this->createMock(\restclient::class);
-        
-        // Mock API responses for different courses
         $mock_client->method('selflearn_get_course_progress')
             ->willReturnCallback(function($slug, $usernames) {
                 if ($slug === 'course1') {
@@ -152,7 +144,6 @@ class integration_test extends \advanced_testcase {
                 }
                 return [];
             });
-
         $users = [(object)['username' => 'student1']];
         $courses = [
             ['slug' => 'course1', 'id' => 1],
@@ -160,9 +151,10 @@ class integration_test extends \advanced_testcase {
             ['slug' => 'course3', 'id' => 3]
         ];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
-        // Assertions
+        // Verify
         $this->assertEquals(80, $result['student1']['course1']);
         $this->assertEquals(90, $result['student1']['course2']);
         $this->assertEquals('---', $result['student1']['course3']);
@@ -177,8 +169,8 @@ class integration_test extends \advanced_testcase {
      * Test 2.1: Calculate average with all courses enrolled
      */
     public function test_average_all_courses_enrolled() {
+        // Setup
         $mock_client = $this->createMock(\restclient::class);
-        
         $mock_client->method('selflearn_get_course_progress')
             ->willReturnCallback(function($slug, $usernames) {
                 if ($slug === 'course1') {
@@ -190,7 +182,6 @@ class integration_test extends \advanced_testcase {
                 }
                 return [];
             });
-
         $users = [(object)['username' => 'student1']];
         $courses = [
             ['slug' => 'course1', 'id' => 1],
@@ -198,9 +189,10 @@ class integration_test extends \advanced_testcase {
             ['slug' => 'course3', 'id' => 3]
         ];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
-        // Average: (60+80+100)/3 = 80
+        // Verify (60+80+100)/3 = 80
         $this->assertEquals(80, $result['student1']['total_average']);
     }
 
@@ -208,8 +200,8 @@ class integration_test extends \advanced_testcase {
      * Test 2.2: Calculate average excluding "---" (not enrolled) courses
      */
     public function test_average_excluding_not_enrolled() {
+        // Setup
         $mock_client = $this->createMock(\restclient::class);
-        
         $mock_client->method('selflearn_get_course_progress')
             ->willReturnCallback(function($slug, $usernames) {
                 if ($slug === 'course1') {
@@ -221,7 +213,6 @@ class integration_test extends \advanced_testcase {
                 }
                 return [];
             });
-
         $users = [(object)['username' => 'student1']];
         $courses = [
             ['slug' => 'course1', 'id' => 1],
@@ -229,9 +220,10 @@ class integration_test extends \advanced_testcase {
             ['slug' => 'course3', 'id' => 3]
         ];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
-        // Average: (70+90)/2 = 80 (course2 not included)
+        // Verify: (70+90)/2 = 80 (course2 not included)
         $this->assertEquals(80, $result['student1']['total_average']);
     }
 
@@ -239,9 +231,8 @@ class integration_test extends \advanced_testcase {
      * Test 2.3: Average is "---" when not enrolled in any course
      */
     public function test_average_not_enrolled_in_any_course() {
-        $mock_client = $this->createMock(\restclient::class);
-        
-        // All courses return empty (not enrolled)
+        // Setup
+        $mock_client = $this->createMock(\restclient::class);        
         $mock_client->method('selflearn_get_course_progress')
             ->willReturn([]);
 
@@ -251,9 +242,10 @@ class integration_test extends \advanced_testcase {
             ['slug' => 'course2', 'id' => 2]
         ];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
-        // Average should be "---" when not enrolled anywhere
+        // Verify
         $this->assertEquals('---', $result['student1']['total_average']);
     }
 
@@ -261,8 +253,8 @@ class integration_test extends \advanced_testcase {
      * Test 2.4: Average includes 0% progress
      */
     public function test_average_includes_zero_percent() {
+        // Setup
         $mock_client = $this->createMock(\restclient::class);
-        
         $mock_client->method('selflearn_get_course_progress')
             ->willReturnCallback(function($slug, $usernames) {
                 if ($slug === 'course1') {
@@ -272,16 +264,16 @@ class integration_test extends \advanced_testcase {
                 }
                 return [];
             });
-
         $users = [(object)['username' => 'student1']];
         $courses = [
             ['slug' => 'course1', 'id' => 1],
             ['slug' => 'course2', 'id' => 2]
         ];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
-        // Average: (0+100)/2 = 50
+        // Verify (0+100)/2 = 50
         $this->assertEquals(50, $result['student1']['total_average']);
     }
 
@@ -293,8 +285,8 @@ class integration_test extends \advanced_testcase {
      * Test 3.1: Handle API exception for specific course
      */
     public function test_api_exception_for_course() {
+        // Setup
         $mock_client = $this->createMock(\restclient::class);
-        
         $mock_client->method('selflearn_get_course_progress')
             ->willReturnCallback(function($slug, $usernames) {
                 if ($slug === 'course1') {
@@ -304,16 +296,16 @@ class integration_test extends \advanced_testcase {
                 }
                 return [];
             });
-
         $users = [(object)['username' => 'student1']];
         $courses = [
             ['slug' => 'course1', 'id' => 1],
             ['slug' => 'course2', 'id' => 2]
         ];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
-        // Assertions
+        // Verify
         $this->assertEquals(80, $result['student1']['course1']);
         $this->assertEquals('Error', $result['student1']['course2']);
         // Average should only include successful courses
@@ -324,6 +316,7 @@ class integration_test extends \advanced_testcase {
      * Test 3.2: Fallback when REST client cannot be created
      */
     public function test_fallback_when_restclient_fails() {
+        // Setup
         $users = [
             (object)['username' => 'student1'],
             (object)['username' => 'student2']
@@ -333,9 +326,10 @@ class integration_test extends \advanced_testcase {
             ['slug' => 'course2', 'id' => 2]
         ];
 
+        // Exercise
         $result = selflearn_get_fallback_progress($users, $courses);
 
-        // Assertions - all should show "SelfLearn unavailable"
+        // Verify - all should show "SelfLearn unavailable"
         $this->assertEquals('SelfLearn unavailable', $result['student1']['course1']);
         $this->assertEquals('SelfLearn unavailable', $result['student1']['course2']);
         $this->assertEquals('---', $result['student1']['total_average']);
@@ -353,11 +347,14 @@ class integration_test extends \advanced_testcase {
      * Test 4.1: Empty users array
      */
     public function test_empty_users_array() {
+        // Setup
         $users = [];
         $courses = [['slug' => 'course1', 'id' => 1]];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses);
 
+        // Verify
         $this->assertEmpty($result);
     }
 
@@ -365,11 +362,14 @@ class integration_test extends \advanced_testcase {
      * Test 4.2: Empty courses array
      */
     public function test_empty_courses_array() {
+        // Setup
         $users = [(object)['username' => 'student1']];
         $courses = [];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses);
 
+        // Verify
         $this->assertEmpty($result);
     }
 
@@ -377,11 +377,14 @@ class integration_test extends \advanced_testcase {
      * Test 4.3: Both empty
      */
     public function test_both_arrays_empty() {
+        // Setup
         $users = [];
         $courses = [];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses);
 
+        // Verify
         $this->assertEmpty($result);
     }
 
@@ -389,29 +392,29 @@ class integration_test extends \advanced_testcase {
      * Test 4.4: API returns null progress
      */
     public function test_api_returns_null_progress() {
+        // Setup
         $mock_client = $this->createMock(\restclient::class);
-        
-        // Mock API response with null progress
         $mock_client->method('selflearn_get_course_progress')
             ->willReturn([
                 ['username' => 'student1', 'progress' => null]
             ]);
-
         $users = [(object)['username' => 'student1']];
         $courses = [['slug' => 'test-course', 'id' => 1]];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
-        // Null progress should be treated as "---"
-        $this->assertEquals('---', $result['student1']['test-course']);
+        // Verify - enrolled but no progress, treated as 0%
+        $this->assertEquals(0, $result['student1']['test-course']);
+        $this->assertEquals(0, $result['student1']['total_average']);
     }
 
     /**
      * Test 4.5: Large dataset (50 students, 5 courses)
      */
     public function test_large_dataset() {
+        // Setup
         $mock_client = $this->createMock(\restclient::class);
-        
         $mock_client->method('selflearn_get_course_progress')
             ->willReturnCallback(function($slug, $usernames) {
                 $username = $usernames[0];
@@ -419,24 +422,22 @@ class integration_test extends \advanced_testcase {
                 $progress = rand(0, 100);
                 return [['username' => $username, 'progress' => $progress]];
             });
-
         // Create 50 students
         $users = [];
         for ($i = 1; $i <= 50; $i++) {
             $users[] = (object)['username' => 'student' . $i];
         }
-
         // Create 5 courses
         $courses = [];
         for ($i = 1; $i <= 5; $i++) {
             $courses[] = ['slug' => 'course' . $i, 'id' => $i];
         }
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
-        // Assertions
+        // Verify
         $this->assertCount(50, $result); // 50 students
-        
         // Check each student has data for 5 courses + average
         foreach ($result as $username => $data) {
             $this->assertCount(6, $data); // 5 courses + total_average
@@ -452,19 +453,19 @@ class integration_test extends \advanced_testcase {
      * Test 5.1: Verify return data structure
      */
     public function test_return_data_structure() {
+        // Setup
         $mock_client = $this->createMock(\restclient::class);
-        
         $mock_client->method('selflearn_get_course_progress')
             ->willReturn([
                 ['username' => 'student1', 'progress' => 75]
             ]);
-
         $users = [(object)['username' => 'student1']];
         $courses = [
             ['slug' => 'course1', 'id' => 1],
             ['slug' => 'course2', 'id' => 2]
         ];
 
+        // Exercise
         $result = selflearn_query_progress($users, $courses, $mock_client);
 
         // Verify structure

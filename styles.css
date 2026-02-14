@@ -128,6 +128,10 @@
     background: #6c757d;
 }
 
+.report-legend li:nth-child(5)::before {
+    background: #dc3545;
+}
+
 /* === PAGINATION === */
 .report-pagination-info {
     font-size: 0.875rem;

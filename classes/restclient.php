@@ -169,14 +169,8 @@ class restclient {
             $params['usernames'] = implode(',', $usernames);
         }
 
-        try {
-            $response = $this->client->get($progress_url, $params);
-            return $this->handle_response($response);
-        } catch (Exception $e) {
-            // Log the error and return empty array
-            error_log("SelfLearn API Error: " . $e->getMessage());
-            return [];
-        }
+        $response = $this->client->get($progress_url, $params);
+        return $this->handle_response($response);
     }
 }
 

@@ -52,5 +52,11 @@ $string['report::legend_title'] = 'Progress Legend';
 $string['report::legend_excellent'] = '80% and above — Excellent';
 $string['report::legend_good'] = '60–79% — Good Progress';
 $string['report::legend_needs_improvement'] = '0–59% — Needs Improvement';
-$string['report::legend_not_enrolled'] = 'Not enrolled in course';
+$string['report::legend_not_enrolled'] = 'Not enrolled in SelfLearn';
+$string['report::legend_not_author'] = 'N/A — Not Author in SelfLearn';
+
+$string['report::selflearn_unavailable_title'] = 'SelfLearn Platform Unavailable';
+$string['report::selflearn_unavailable_message'] = 'The SelfLearn platform is currently not reachable. No progress data can be displayed. Please try again later.';
+$string['report::selflearn_error_title'] = 'SelfLearn Report Error';
+$string['report::selflearn_error_message'] = 'Unable to retrieve progress data from the SelfLearn platform. This may be because you do not have an author account on SelfLearn, or the connection was blocked. Please ensure you have a valid SelfLearn account and try again.';
 ?>

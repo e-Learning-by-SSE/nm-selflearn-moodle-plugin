@@ -94,6 +94,30 @@ $data = $cache->get($id);
 if ($data === false || $refresh) {
     $progress = selflearn_query_progress($students, $courses);
 
+
+    // Check if API returned an error
+    if (isset($progress['_error'])) {
+        $cache->delete($id);
+        echo $OUTPUT->header();
+        echo $OUTPUT->heading($pagetitle);
+        echo '<div class="alert alert-danger" role="alert">';
+
+        if ($progress['_error'] === 'unavailable') {
+            echo '<h4>' . get_string('report::selflearn_unavailable_title', 'selflearn') . '</h4>';
+            echo '<p>' . get_string('report::selflearn_unavailable_message', 'selflearn') . '</p>';
+        } else {
+            echo '<h4>' . get_string('report::selflearn_error_title', 'selflearn') . '</h4>';
+            echo '<p>' . get_string('report::selflearn_error_message', 'selflearn') . '</p>';
+        }
+
+        $refreshurl = new moodle_url('/mod/selflearn/coursereport.php', ['id' => $id, 'refresh' => 1]);
+        echo html_writer::link($refreshurl, get_string('report::refresh_data', 'selflearn'), ['class' => 'btn btn-primary mt-2']);
+        echo '</div>';
+        echo $OUTPUT->footer();
+        die();
+    }
+
+
     foreach ($students as $user) {
         $combined = [
             $user->firstname,
@@ -106,8 +130,10 @@ if ($data === false || $refresh) {
 
             if (isset($progress[$user->username]) && isset($progress[$user->username][$slug])) {
                 $value = $progress[$user->username][$slug];
-                if ($value === null || $value === false || $value === "---") {                    
+                if ($value === null || $value === false || $value === "---") {
                     $combined[] = '---';
+                } else if ($value === "Error") {
+                    $combined[] = 'N/A';
                 } else {
                     $combined[] = floatval($value);
                 }
@@ -118,7 +144,7 @@ if ($data === false || $refresh) {
 
         if (isset($progress[$user->username]['total_average'])) {
             $avg = $progress[$user->username]['total_average'];
-            $combined[] = ($avg !== null && $avg !== false) ? floatval($avg) : '---';
+            $combined[] = ($avg !== null && $avg !== false && $avg !== "---" && $avg !== "Error") ? floatval($avg) : '---';
         } else {
             $combined[] = '---';
         }
@@ -140,20 +166,20 @@ if ($data === false || $refresh) {
 $filtered = $merged;
 if (!empty($search)) {
     $search_lower = strtolower(trim($search));
-    $filtered = array_filter($merged, function($entry) use ($search_lower) {
+    $filtered = array_filter($merged, function ($entry) use ($search_lower) {
         $firstname = strtolower($entry[0]);
         $lastname = strtolower($entry[1]);
         $username = strtolower($entry[2]);
-        
+
         return (strpos($firstname, $search_lower) !== false ||
-                strpos($lastname, $search_lower) !== false ||
-                strpos($username, $search_lower) !== false);
+            strpos($lastname, $search_lower) !== false ||
+            strpos($username, $search_lower) !== false);
     });
     $filtered = array_values($filtered);
 }
 
 // Sort data
-usort($filtered, function($a, $b) use ($sortby, $sortorder) {
+usort($filtered, function ($a, $b) use ($sortby, $sortorder) {
     $index = $sortby;
     if ($index == 0 || $index == 1 || $index == 2) {
         return $sortorder == 'ASC' ? strcmp($a[$index], $b[$index]) : strcmp($b[$index], $a[$index]);
@@ -180,7 +206,7 @@ $progress_count = 0;
 
 foreach ($filtered as $entry) {
     $has_any_enrollment = false;
-    
+
     for ($i = 3; $i < count($entry) - 1; $i++) {
         if ($entry[$i] !== '---' && $entry[$i] !== 'N/A') {
             $has_any_enrollment = true;
@@ -201,8 +227,8 @@ $avg_progress = ($progress_count > 0) ? round($total_progress / $progress_count,
 global $PAGE, $OUTPUT;
 $pagetitle = get_string("report::title", "selflearn");
 $pageurl = new moodle_url('/mod/selflearn/coursereport.php', [
-    'id' => $id, 
-    'sortby' => $sortby, 
+    'id' => $id,
+    'sortby' => $sortby,
     'sortorder' => $sortorder,
     'page' => $page,
     'perpage' => $perpage,
@@ -297,32 +323,37 @@ if (empty($paginated_data)) {
     echo '<tr>';
 
     $baseParams = ['id' => $id, 'page' => $page, 'perpage' => $perpage, 'search' => $search, 'sortorder' => $nextsortorder];
-    
+
     $firstNameUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($baseParams, ['sortby' => 0]));
     echo '<th><a href="' . $firstNameUrl . '">' . get_string("report::first_name", "selflearn");
-    if ($sortby == 0) echo ($sortorder == 'ASC') ? ' ↑' : ' ↓';
+    if ($sortby == 0)
+        echo ($sortorder == 'ASC') ? ' ↑' : ' ↓';
     echo '</a></th>';
 
     $lastNameUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($baseParams, ['sortby' => 1]));
     echo '<th><a href="' . $lastNameUrl . '">' . get_string("report::last_name", "selflearn");
-    if ($sortby == 1) echo ($sortorder == 'ASC') ? ' ↑' : ' ↓';
+    if ($sortby == 1)
+        echo ($sortorder == 'ASC') ? ' ↑' : ' ↓';
     echo '</a></th>';
 
     $usernameUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($baseParams, ['sortby' => 2]));
     echo '<th><a href="' . $usernameUrl . '">' . get_string('report::username', 'selflearn');
-    if ($sortby == 2) echo ($sortorder == 'ASC') ? ' ↑' : ' ↓';
+    if ($sortby == 2)
+        echo ($sortorder == 'ASC') ? ' ↑' : ' ↓';
     echo '</a></th>';
 
     for ($i = 0; $i < count($instances); $i++) {
         $activityUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($baseParams, ['sortby' => ($i + 3)]));
         echo '<th><a href="' . $activityUrl . '">' . $instances[$i]["name"];
-        if ($sortby == ($i + 3)) echo ($sortorder == 'ASC') ? ' ↑' : ' ↓';
+        if ($sortby == ($i + 3))
+            echo ($sortorder == 'ASC') ? ' ↑' : ' ↓';
         echo '</a></th>';
     }
 
     $avgUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($baseParams, ['sortby' => (count($instances) + 3)]));
     echo '<th><a href="' . $avgUrl . '">' . get_string('report::average', 'selflearn');
-    if ($sortby == (count($instances) + 3)) echo ($sortorder == 'ASC') ? ' ↑' : ' ↓';
+    if ($sortby == (count($instances) + 3))
+        echo ($sortorder == 'ASC') ? ' ↑' : ' ↓';
     echo '</a></th>';
 
     echo '</tr>';
@@ -335,15 +366,21 @@ if (empty($paginated_data)) {
             $value = $entry[$i];
 
             if ($i >= 3) {
-                if ($value === '---' || $value === 'N/A') {
+                if ($value === '---') {
                     echo '<td class="text-muted"><em>' . $value . '</em></td>';
+                } else if ($value === 'N/A') {
+                    echo '<td class="text-danger"><strong>' . $value . '</strong></td>';
                 } else {
                     $percentage = floatval($value);
                     $class = '';
-                    if ($percentage >= 80) $class = 'text-success';
-                    elseif ($percentage >= 60) $class = 'text-warning';
-                    elseif ($percentage >= 0) $class = 'text-danger';
-                    else $class = 'text-muted';
+                    if ($percentage >= 80)
+                        $class = 'text-success';
+                    elseif ($percentage >= 60)
+                        $class = 'text-warning';
+                    elseif ($percentage >= 0)
+                        $class = 'text-danger';
+                    else
+                        $class = 'text-muted';
 
                     echo '<td class="' . $class . '"><strong>' . number_format($percentage, 1) . '%</strong></td>';
                 }
@@ -360,34 +397,34 @@ if (empty($paginated_data)) {
 
     // Bottom Section: Pagination + Legend
     echo '<div class="report-bottom-layout">';
-    
+
     // Pagination
     echo '<div class="pagination-wrapper">';
-    
+
     if ($total_pages > 1) {
         echo '<div class="d-flex justify-content-between align-items-center my-3">';
-        
+
         $start = $offset + 1;
         $end = min($offset + $perpage, $total_records);
         echo '<div class="report-pagination-info text-muted">';
         echo get_string('report::showing_entries', 'selflearn', ['start' => $start, 'end' => $end, 'total' => $total_records]);
         echo '</div>';
-        
+
         echo '<nav aria-label="Page navigation">';
         echo '<ul class="pagination mb-0">';
-        
+
         $paginationParams = ['id' => $id, 'sortby' => $sortby, 'sortorder' => $sortorder, 'perpage' => $perpage, 'search' => $search];
-        
+
         if ($page > 1) {
             $prevUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($paginationParams, ['page' => ($page - 1)]));
             echo '<li class="page-item"><a class="page-link" href="' . $prevUrl . '">' . get_string('report::previous', 'selflearn') . '</a></li>';
         } else {
             echo '<li class="page-item disabled"><span class="page-link">' . get_string('report::previous', 'selflearn') . '</span></li>';
         }
-        
+
         $start_page = max(1, $page - 2);
         $end_page = min($total_pages, $page + 2);
-        
+
         if ($start_page > 1) {
             $firstUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($paginationParams, ['page' => 1]));
             echo '<li class="page-item"><a class="page-link" href="' . $firstUrl . '">1</a></li>';
@@ -395,7 +432,7 @@ if (empty($paginated_data)) {
                 echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
             }
         }
-        
+
         for ($i = $start_page; $i <= $end_page; $i++) {
             $pageNumUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($paginationParams, ['page' => $i]));
             if ($i == $page) {
@@ -404,7 +441,7 @@ if (empty($paginated_data)) {
                 echo '<li class="page-item"><a class="page-link" href="' . $pageNumUrl . '">' . $i . '</a></li>';
             }
         }
-        
+
         if ($end_page < $total_pages) {
             if ($end_page < $total_pages - 1) {
                 echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
@@ -412,21 +449,21 @@ if (empty($paginated_data)) {
             $lastUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($paginationParams, ['page' => $total_pages]));
             echo '<li class="page-item"><a class="page-link" href="' . $lastUrl . '">' . $total_pages . '</a></li>';
         }
-        
+
         if ($page < $total_pages) {
             $nextUrl = new moodle_url('/mod/selflearn/coursereport.php', array_merge($paginationParams, ['page' => ($page + 1)]));
             echo '<li class="page-item"><a class="page-link" href="' . $nextUrl . '">' . get_string('report::next', 'selflearn') . '</a></li>';
         } else {
             echo '<li class="page-item disabled"><span class="page-link">' . get_string('report::next', 'selflearn') . '</span></li>';
         }
-        
+
         echo '</ul>';
         echo '</nav>';
         echo '</div>';
     }
-    
+
     echo '</div>';
-    
+
     // Legend
     echo '<div class="card report-legend">';
     echo '<div class="card-body">';
@@ -436,10 +473,11 @@ if (empty($paginated_data)) {
     echo '<li>' . get_string('report::legend_good', 'selflearn') . '</li>';
     echo '<li>' . get_string('report::legend_needs_improvement', 'selflearn') . '</li>';
     echo '<li>' . get_string('report::legend_not_enrolled', 'selflearn') . '</li>';
+    echo '<li>' . get_string('report::legend_not_author', 'selflearn') . '</li>';
     echo '</ul>';
     echo '</div>';
     echo '</div>';
-    
+
     echo '</div>';
 }
 

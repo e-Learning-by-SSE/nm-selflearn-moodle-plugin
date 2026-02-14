@@ -18,15 +18,20 @@ function selflearn_query_progress($users, $courses, $restclient = null) {
         return $studentScores;
     }
 
-    // Create REST client (for testing)
+    // Create REST client
     if ($restclient === null) {
         try {
             $restclient = new restclient();
         } catch (Exception $e) {
             error_log("SelfLearn: Cannot create REST client - " . $e->getMessage());
-            return selflearn_get_fallback_progress($users, $courses);
+            return ['_error' => 'unavailable', '_message' => $e->getMessage()];
         }
     }
+
+    // Track if ALL API calls fail
+    $total_calls = 0;
+    $failed_calls = 0;
+    $last_error = '';
 
     // Extract usernames for API call
     $usernames = array_map(function($user) {
@@ -39,12 +44,11 @@ function selflearn_query_progress($users, $courses, $restclient = null) {
         $validCourses = 0;
 
         foreach ($courses as $course) {
+            $total_calls++;
             try {
                 // Get progress for this specific course and user
                 $progress_data = $restclient->selflearn_get_course_progress($course["slug"], [$user->username]);
 
-                // DEBUG: Log the API response
-                error_log("SelfLearn DEBUG: User=" . $user->username . ", Course=" . $course["slug"] . ", API Response=" . json_encode($progress_data));
 
                 $score = null;
                 $userFound = false;
@@ -55,35 +59,33 @@ function selflearn_query_progress($users, $courses, $restclient = null) {
                         if ($student_progress['username'] === $user->username) {
                             $score = $student_progress['progress'];
                             $userFound = true;
-                            error_log("SelfLearn DEBUG: User FOUND in API response with progress=" . $score);
                             break;
                         }
                     }
-                } else {
-                    error_log("SelfLearn DEBUG: API returned empty array for user=" . $user->username);
                 }
 
                 // Handle different cases based on API response
                 if (!$userFound) {
                     // API returned empty array = user not enrolled in SelfLearn course
                     $userScores[$course["slug"]] = "---";
-                    error_log("SelfLearn DEBUG: Setting --- for non-enrolled user=" . $user->username);
                 } else if ($score === null) {
                     // User found but progress is null
-                    $userScores[$course["slug"]] = "---";
-                    error_log("SelfLearn DEBUG: Setting --- for user with null progress=" . $user->username);
+                    $userScores[$course["slug"]] = 0;
+                    $totalScore += 0;
+                    $validCourses++;
                 } else {
                     // User enrolled with actual progress (including 0%)
                     $userScores[$course["slug"]] = $score;
                     $totalScore += $score;
                     $validCourses++;
-                    error_log("SelfLearn DEBUG: Setting progress=" . $score . " for enrolled user=" . $user->username);
                 }
 
             } catch (Exception $e) {
                 // API error for this course
                 error_log("SelfLearn: API error for course " . $course["slug"] . " - " . $e->getMessage());
                 $userScores[$course["slug"]] = "Error";
+                $failed_calls++;
+                $last_error = $e->getMessage();
             }
         }
 
@@ -96,6 +98,11 @@ function selflearn_query_progress($users, $courses, $restclient = null) {
         }
 
         $studentScores[$user->username] = $userScores;
+    }
+
+    // If ALL API calls failed, return error
+    if ($failed_calls > 0 && $failed_calls === $total_calls) {
+        return ['_error' => 'api_error', '_message' => $last_error];
     }
 
     return $studentScores;
