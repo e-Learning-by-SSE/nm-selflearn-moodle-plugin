@@ -60,4 +60,6 @@ $string['report::selflearn_unavailable_title'] = 'SelfLearn-Plattform nicht erre
 $string['report::selflearn_unavailable_message'] = 'Die SelfLearn-Plattform ist derzeit nicht erreichbar. Es können keine Fortschrittsdaten angezeigt werden. Bitte versuchen Sie es später erneut.';
 $string['report::selflearn_error_title'] = 'SelfLearn-Berichtsfehler';
 $string['report::selflearn_error_message'] = 'Die Fortschrittsdaten konnten nicht von der SelfLearn-Plattform abgerufen werden. Dies kann daran liegen, dass Sie kein Autorenkonto auf SelfLearn haben oder die Verbindung blockiert wurde. Bitte versuchen Sie es erneut.';
+$string['report::export_no_data_title'] = 'Keine Daten zum Exportieren verfügbar';
+$string['report::export_no_data_message'] = 'Es sind keine zwischengespeicherten Berichtsdaten zum Exportieren vorhanden. Bitte öffnen Sie die Berichtsseite und aktualisieren Sie die Daten zuerst.';
 ?>

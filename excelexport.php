@@ -20,7 +20,22 @@ $cache = cache::make('mod_selflearn', 'report_cache');
 $data = $cache->get($id);
 
 if ($data === false || empty($data->data)) {
-    throw new moodle_exception('error::no_data_available', 'selflearn');
+    $course = get_course($id);
+    $context = context_course::instance($id);
+    $PAGE->set_context($context);
+    $PAGE->set_url(new moodle_url('/mod/selflearn/excelexport.php', ['id' => $id]));
+    $PAGE->set_title(get_string('report::title', 'selflearn'));
+    $PAGE->set_heading(format_string($course->fullname, true, ['context' => $context]));
+
+    echo $OUTPUT->header();
+    echo '<div class="alert alert-warning" role="alert">';
+    echo '<h4>' . get_string('report::export_no_data_title', 'selflearn') . '</h4>';
+    echo '<p>' . get_string('report::export_no_data_message', 'selflearn') . '</p>';
+    $reporturl = new moodle_url('/mod/selflearn/coursereport.php', ['id' => $id, 'refresh' => 1]);
+    echo html_writer::link($reporturl, get_string('report::refresh_data', 'selflearn'), ['class' => 'btn btn-primary mt-2']);
+    echo '</div>';
+    echo $OUTPUT->footer();
+    die();
 }
 
 // Determine delimiter based on locale
