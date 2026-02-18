@@ -21,6 +21,7 @@ $search = optional_param('search', '', PARAM_TEXT);
 
 // Access + permissions
 $course = get_course($id);
+$coursefullname = $course->fullname;
 require_login($id);
 
 $context = context_course::instance($id);
@@ -86,6 +87,8 @@ if (empty($courses)) {
     echo $OUTPUT->footer();
     die();
 }
+
+$pagetitle = get_string("report::title", "selflearn");
 
 // Get or compute progress data
 $merged = [];
@@ -225,7 +228,6 @@ $avg_progress = ($progress_count > 0) ? round($total_progress / $progress_count,
 
 // Page setup
 global $PAGE, $OUTPUT;
-$pagetitle = get_string("report::title", "selflearn");
 $pageurl = new moodle_url('/mod/selflearn/coursereport.php', [
     'id' => $id,
     'sortby' => $sortby,
@@ -238,7 +240,7 @@ $PAGE->set_pagelayout('incourse');
 $PAGE->set_context($context);
 $PAGE->set_url($pageurl);
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading(format_string($course->fullname, true, ['context' => $context]));
+$PAGE->set_heading(format_string($coursefullname, true, ['context' => $context]));
 $PAGE->add_body_class('limitedwidth');
 
 $PAGE->requires->css('/mod/selflearn/styles.css');
