@@ -33,11 +33,6 @@ function selflearn_query_progress($users, $courses, $restclient = null) {
     $failed_calls = 0;
     $last_error = '';
 
-    // Extract usernames for API call
-    $usernames = array_map(function($user) {
-        return $user->username;
-    }, $users);
-
     foreach ($users as $user) {
         $totalScore = 0;
         $userScores = [];
@@ -48,8 +43,6 @@ function selflearn_query_progress($users, $courses, $restclient = null) {
             try {
                 // Get progress for this specific course and user
                 $progress_data = $restclient->selflearn_get_course_progress($course["slug"], [$user->username]);
-
-
                 $score = null;
                 $userFound = false;
 

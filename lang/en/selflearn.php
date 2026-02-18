@@ -49,9 +49,9 @@ $string['report::showing_entries'] = 'Showing {$a->start}–{$a->end} of {$a->to
 $string['report::previous'] = 'Previous';
 $string['report::next'] = 'Next';
 $string['report::legend_title'] = 'Progress Legend';
-$string['report::legend_excellent'] = '80% and above — Excellent';
-$string['report::legend_good'] = '60–79% — Good Progress';
-$string['report::legend_needs_improvement'] = '0–59% — Needs Improvement';
+$string['report::legend_excellent'] = '80% and above';
+$string['report::legend_good'] = '60–79%';
+$string['report::legend_needs_improvement'] = '0–59%';
 $string['report::legend_not_enrolled'] = 'Not enrolled in SelfLearn';
 $string['report::legend_not_author'] = 'N/A — Not Author in SelfLearn';
 

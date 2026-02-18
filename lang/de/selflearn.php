@@ -49,9 +49,9 @@ $string['report::showing_entries'] = 'Zeige {$a->start}–{$a->end} von {$a->tot
 $string['report::previous'] = 'Zurück';
 $string['report::next'] = 'Weiter';
 $string['report::legend_title'] = 'Fortschrittslegende';
-$string['report::legend_excellent'] = '80% und mehr — Ausgezeichnet';
-$string['report::legend_good'] = '60–79% — Guter Fortschritt';
-$string['report::legend_needs_improvement'] = '0–59% — Verbesserungsbedarf';
+$string['report::legend_excellent'] = '80% und mehr';
+$string['report::legend_good'] = '60–79%';
+$string['report::legend_needs_improvement'] = '0–59%';
 $string['report::legend_not_enrolled'] = 'Nicht im Kurs eingeschrieben';
 $string['report::legend_not_author'] = 'N/A — Kein Autor in SelfLearn';
 
