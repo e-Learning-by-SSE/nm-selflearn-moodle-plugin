@@ -95,7 +95,9 @@ PHP
         '''
 		  
 						catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {		  
-							php -d pcov.enabled=1 -d pcov.directory=/var/www/html/public/mod/selflearn vendor/bin/phpunit --testsuite mod_selflearn --log-junit "$WORKSPACE/build/test-results/junit.xml" --coverage-clover "$WORKSPACE/build/coverage/clover.xml" --coverage-filter "/var/www/html/public/mod/selflearn"
+							sh '''
+							   php -d pcov.enabled=1 -d pcov.directory=/var/www/html/public/mod/selflearn vendor/bin/phpunit --testsuite mod_selflearn --log-junit "$WORKSPACE/build/test-results/junit.xml" --coverage-clover "$WORKSPACE/build/coverage/clover.xml" --coverage-filter "/var/www/html/public/mod/selflearn"
+							'''
 						}
                     }
 				}
