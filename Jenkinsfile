@@ -45,7 +45,7 @@ pipeline {
           set -euxo pipefail
 
           # Where Moodle lives in your image
-          MOODLE_DIR=/var/www/html/public
+          MOODLE_DIR=/var/www/html/
 
           # Reports + dataroot (must be writable)
           mkdir -p "$WORKSPACE/build/test-results"
@@ -91,9 +91,9 @@ PHP
           # 3) Run PHPUnit init + tests + JUnit report
           cd "$MOODLE_DIR"
 
-          php admin/tool/phpunit/cli/init.php
+          php public/admin/tool/phpunit/cli/init.php
 
-          php admin/tool/phpunit/cli/run.php mod/selflearn/tests --log-junit "$WORKSPACE/build/test-results/junit.xml"
+          php vendor/bin/phpunit --testsuite mod_forum_testsuite --log-junit "$WORKSPACE/build/test-results/junit.xml"
         '''
                     }
 				}
