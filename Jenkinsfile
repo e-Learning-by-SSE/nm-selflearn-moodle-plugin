@@ -95,7 +95,7 @@ PHP
         '''
 		  
 						catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {		  
-							php vendor/bin/phpunit --testsuite mod_selflearn --log-junit "$WORKSPACE/build/test-results/junit.xml"
+							php -d pcov.enabled=1 -d pcov.directory=/var/www/html/public/mod/selflearn vendor/bin/phpunit --testsuite mod_selflearn --log-junit "$WORKSPACE/build/test-results/junit.xml" --coverage-clover "$WORKSPACE/build/coverage/clover.xml" --coverage-filter /var/www/html/public/mod/selflearn
 						}
                     }
 				}
@@ -104,6 +104,17 @@ PHP
 			    always {
 					junit testResults: 'build/test-results/*.xml', allowEmptyResults: true
 					archiveArtifacts artifacts: 'build/test-results/*.xml', fingerprint: true, allowEmptyArchive: true
+					
+					if (fileExists('build/coverage/clover.xml')) {
+						catchError(buildResult: 'SUCCESS') {
+						    recordCoverage(
+								tools: [[parser: clover]],
+								id: 'clover', name: 'Clover Coverage',
+								sourceCodeRetention: 'EVERY_BUILD',
+								skipPublishingChecks: true
+						    )
+						}
+					}
 				}
 			}
         }
