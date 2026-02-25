@@ -27,8 +27,38 @@ $string['report::export_btn'] = 'Export';
 $string['error::rest_api_blocked_by_moodle'] = 'Error: SelfLearn REST API blocked by Moodle, please contact an administrator.';
 $string['error::rest_api_blocked'] = 'Error: Connection to SelfLearn REST API blocked. Reason: {reason}';
 $string['error::wrong_role:author'] = 'Error: You need to be a SelfLearn "Author" to perform the action.';
-$string['error::unauthorized_user'] = 'Fehler: You need a SelfLearn account. Please log into the SelfLearn platform ({$a->link}) once, before continuing your request.';
+$string['error::unauthorized_user'] = 'Error: You need a SelfLearn account. Please log into the SelfLearn platform ({$a->link}) once, before continuing your request.';
 $string['error::selflearn_not_reachable'] = 'Error: SelfLearn platform not reachable, please contact an administrator.';
-$string['error::No SelfLearn Base URL configured'] = 'Error: SelfLearn URL unknown, please contact an administrator.';
-$string['error::No OAuth2 provider configured'] = 'Error: No SelfLearn Auth provider configuered, please contact an administrator.';
+$string['error::No_SelfLearn_Base_URL_configured'] = 'Error: SelfLearn URL unknown, please contact an administrator.';
+$string['error::No_OAuth2_provider_configured'] = 'Error: No SelfLearn Auth provider configuered, please contact an administrator.';
+$string['error::OAuth2_misconfigured'] = 'Error: The SelfLearn authentication service is misconfigured, please contact an administrator.';
+
+// New strings for course report
+$string['report::refresh_data'] = 'Refresh Data';
+$string['report::last_updated'] = 'Last Updated:';
+$string['report::cache_info'] = 'Progress data is cached for performance. Click "Refresh Data" to get the latest information.';
+$string['report::total_students'] = 'Total Students';
+$string['report::enrolled_students'] = 'Enrolled';
+$string['report::average_progress'] = 'Average Progress';
+$string['report::activities_count'] = 'Activities';
+$string['report::search_placeholder'] = 'Search by name or username';
+$string['report::no_results'] = 'No students found matching your search criteria.';
+$string['report::username'] = 'Username';
+$string['report::average'] = 'Average';
+$string['report::showing_entries'] = 'Showing {$a->start}–{$a->end} of {$a->total} students';
+$string['report::previous'] = 'Previous';
+$string['report::next'] = 'Next';
+$string['report::legend_title'] = 'Progress Legend';
+$string['report::legend_excellent'] = '80% and above';
+$string['report::legend_good'] = '60–79%';
+$string['report::legend_needs_improvement'] = '0–59%';
+$string['report::legend_not_enrolled'] = 'Not enrolled in SelfLearn';
+$string['report::legend_not_author'] = 'N/A — Not Author in SelfLearn';
+
+$string['report::selflearn_unavailable_title'] = 'SelfLearn Platform Unavailable';
+$string['report::selflearn_unavailable_message'] = 'The SelfLearn platform is currently not reachable. No progress data can be displayed. Please try again later.';
+$string['report::selflearn_error_title'] = 'SelfLearn Report Error';
+$string['report::selflearn_error_message'] = 'Unable to retrieve progress data from the SelfLearn platform. This may be because you do not have an author account on SelfLearn, or the connection was blocked. Please ensure you have a valid SelfLearn account and try again.';
+$string['report::export_no_data_title'] = 'No Data Available for Export';
+$string['report::export_no_data_message'] = 'There is no cached report data to export. Please go to the report page and refresh the data first.';
 ?>

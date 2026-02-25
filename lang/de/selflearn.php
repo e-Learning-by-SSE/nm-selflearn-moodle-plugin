@@ -29,6 +29,37 @@ $string['error::rest_api_blocked'] = 'Fehler: Verbindung zu SelfLearn REST API b
 $string['error::wrong_role:author'] = 'Fehler: Für die angeforderte Aktion benötigen Sie die Rolle "Author" in der SelfLearn-Platform.';
 $string['error::unauthorized_user'] = 'Fehler: Sie benötigen einen SelfLearn Account für die angeforderte Aktion. Loggen Sie sich einmalig in der SelfLearn-Plattform ({$a->link}) ein, um fortzufahren.';
 $string['error::selflearn_not_reachable'] = 'Fehler: SelfLearn Plattform ist nichr erreichbar, dieses Problem kann nur durch einen Admin behoben werden.';
-$string['error::No SelfLearn Base URL configured'] = 'Fehler: SelfLearn Plattform URL unbekannt, dieses Problem kann nur durch einen Admin behoben werden.';
-$string['error::No OAuth2 provider configured'] = 'Fehler: Es wurde kein SelfLearn Authentifizierungsdienst konfiguriert, dieses Problem kann nur durch einen Admin behoben werden.';
+$string['error::No_SelfLearn_Base_URL_configured'] = 'Fehler: SelfLearn Plattform URL unbekannt, dieses Problem kann nur durch einen Admin behoben werden.';
+$string['error::No_OAuth2_provider_configured'] = 'Fehler: Es wurde kein SelfLearn Authentifizierungsdienst konfiguriert, dieses Problem kann nur durch einen Admin behoben werden.';
+$string['error::OAuth2_misconfigured'] = 'Fehler: Der SelfLearn Authentifizierungsdienst wurde fehlerhaft konfiguriert, dieses Problem kann nur durch einen Admin behoben werden.';
+
+// New strings for course report
+$string['report::refresh_data'] = 'Daten aktualisieren';
+$string['report::last_updated'] = 'Zuletzt aktualisiert:';
+$string['report::cache_info'] = 'Die Fortschrittsdaten werden aus Performance-Gründen zwischengespeichert. Klicken Sie auf "Daten aktualisieren", um die neuesten Informationen zu erhalten.';
+$string['report::total_students'] = 'Studierende insgesamt';
+$string['report::enrolled_students'] = 'Eingeschrieben';
+$string['report::average_progress'] = 'Durchschnittlicher Fortschritt';
+$string['report::activities_count'] = 'Aktivitäten';
+$string['report::search_placeholder'] = 'Nach Name oder Benutzername suchen';
+$string['report::no_results'] = 'Keine Studierenden gefunden, die den Suchkriterien entsprechen.';
+$string['report::username'] = 'Benutzername';
+$string['report::average'] = 'Durchschnitt';
+$string['report::showing_entries'] = 'Zeige {$a->start}–{$a->end} von {$a->total} Studierenden';
+$string['report::previous'] = 'Zurück';
+$string['report::next'] = 'Weiter';
+$string['report::legend_title'] = 'Fortschrittslegende';
+$string['report::legend_excellent'] = '80% und mehr';
+$string['report::legend_good'] = '60–79%';
+$string['report::legend_needs_improvement'] = '0–59%';
+$string['report::legend_not_enrolled'] = 'Nicht im Kurs eingeschrieben';
+$string['report::legend_not_author'] = 'N/A — Kein Autor in SelfLearn';
+
+
+$string['report::selflearn_unavailable_title'] = 'SelfLearn-Plattform nicht erreichbar';
+$string['report::selflearn_unavailable_message'] = 'Die SelfLearn-Plattform ist derzeit nicht erreichbar. Es können keine Fortschrittsdaten angezeigt werden. Bitte versuchen Sie es später erneut.';
+$string['report::selflearn_error_title'] = 'SelfLearn-Berichtsfehler';
+$string['report::selflearn_error_message'] = 'Die Fortschrittsdaten konnten nicht von der SelfLearn-Plattform abgerufen werden. Dies kann daran liegen, dass Sie kein Autorenkonto auf SelfLearn haben oder die Verbindung blockiert wurde. Bitte versuchen Sie es erneut.';
+$string['report::export_no_data_title'] = 'Keine Daten zum Exportieren verfügbar';
+$string['report::export_no_data_message'] = 'Es sind keine zwischengespeicherten Berichtsdaten zum Exportieren vorhanden. Bitte öffnen Sie die Berichtsseite und aktualisieren Sie die Daten zuerst.';
 ?>

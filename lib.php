@@ -9,28 +9,112 @@
  */
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/filelib.php');
+require_once(__DIR__ . '/classes/restclient.php');
 
-function selflearn_query_progress($users, $courses) {
+function selflearn_query_progress($users, $courses, $restclient = null) {
     $studentScores = [];
+
+    if (empty($users) || empty($courses)) {
+        return $studentScores;
+    }
+
+    // Create REST client
+    if ($restclient === null) {
+        try {
+            $restclient = new restclient();
+        } catch (Exception $e) {
+            error_log("SelfLearn: Cannot create REST client - " . $e->getMessage());
+            return ['_error' => 'unavailable', '_message' => $e->getMessage()];
+        }
+    }
+
+    // Track if ALL API calls fail
+    $total_calls = 0;
+    $failed_calls = 0;
+    $last_error = '';
 
     foreach ($users as $user) {
         $totalScore = 0;
         $userScores = [];
+        $validCourses = 0;
 
         foreach ($courses as $course) {
-            // Generate a random score between 0 and 100
-            $score = rand(0, 100);
-            $userScores[$course["slug"]] = $score;
-            $totalScore += $score;
+            $total_calls++;
+            try {
+                // Get progress for this specific course and user
+                $progress_data = $restclient->selflearn_get_course_progress($course["slug"], [$user->username]);
+                $score = null;
+                $userFound = false;
+
+                // Check if API returned any data for this user
+                if (!empty($progress_data)) {
+                    foreach ($progress_data as $student_progress) {
+                        if ($student_progress['username'] === $user->username) {
+                            $score = $student_progress['progress'];
+                            $userFound = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Handle different cases based on API response
+                if (!$userFound) {
+                    // API returned empty array = user not enrolled in SelfLearn course
+                    $userScores[$course["slug"]] = "---";
+                } else if ($score === null) {
+                    // User found but progress is null
+                    $userScores[$course["slug"]] = 0;
+                    $totalScore += 0;
+                    $validCourses++;
+                } else {
+                    // User enrolled with actual progress (including 0%)
+                    $userScores[$course["slug"]] = $score;
+                    $totalScore += $score;
+                    $validCourses++;
+                }
+
+            } catch (Exception $e) {
+                // API error for this course
+                error_log("SelfLearn: API error for course " . $course["slug"] . " - " . $e->getMessage());
+                $userScores[$course["slug"]] = "Error";
+                $failed_calls++;
+                $last_error = $e->getMessage();
+            }
         }
 
-        // Calculate the average score for the student
-        $averageScore = $totalScore / count($courses);
+        // Calculate average only for courses where student is enrolled
+        if ($validCourses > 0) {
+            $averageScore = $totalScore / $validCourses;
+            $userScores['total_average'] = round($averageScore, 2);
+        } else {
+            $userScores['total_average'] = "---";
+        }
 
-        // Add the average score to the user's scores
-        $userScores['total_average'] = round($averageScore, 2);
+        $studentScores[$user->username] = $userScores;
+    }
 
-        // Store the user's scores in the result array
+    // If ALL API calls failed, return error
+    if ($failed_calls > 0 && $failed_calls === $total_calls) {
+        return ['_error' => 'api_error', '_message' => $last_error];
+    }
+
+    return $studentScores;
+}
+
+/**
+ * Fallback function when SelfLearn API is unavailable
+ */
+function selflearn_get_fallback_progress($users, $courses) {
+    $studentScores = [];
+
+    foreach ($users as $user) {
+        $userScores = [];
+
+        foreach ($courses as $course) {
+            $userScores[$course["slug"]] = "SelfLearn unavailable";
+        }
+
+        $userScores['total_average'] = "---";
         $studentScores[$user->username] = $userScores;
     }
 
@@ -138,16 +222,17 @@ function mod_selflearn_extend_navigation_course($navigation, $course, $context):
         $config = get_config('mod_selflearn');
         if (!empty($config->selflearn_base_url)) {
             $authoring_url = new moodle_url($config->selflearn_base_url . "dashboard/author");
+            // $authoring_url = $config->selflearn_base_url . "dashboard/author";
 
             $settingsnode = navigation_node::create(get_string('menu::authoring_page_label', 'selflearn'), $authoring_url, navigation_node::TYPE_CUSTOM,
                 null, 'selflearn_authoring_page', new pix_icon('monologo', '', 'mod_selflearn'));
             $navigation->add_node($settingsnode);
         }
 
-        // // Progress report of students
-        // $report_page = new moodle_url('/mod/selflearn/coursereport.php', ['id' => $course->id]);
-        // $settingsnode = navigation_node::create(get_string('report::title', 'selflearn'), $report_page, navigation_node::TYPE_SETTING,
-        //     null, 'selflearn', new pix_icon('i/selflearn', ''));
-        // $navigation->add_node($settingsnode);
+        // Progress report of students
+        $report_page = new moodle_url('/mod/selflearn/coursereport.php', ['id' => $course->id]);
+        $settingsnode = navigation_node::create(get_string('report::title', 'selflearn'), $report_page, navigation_node::TYPE_SETTING,
+            null, 'selflearn', new pix_icon('i/selflearn', ''));
+        $navigation->add_node($settingsnode);
     }
 }

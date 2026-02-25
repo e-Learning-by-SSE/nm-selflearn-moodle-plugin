@@ -24,19 +24,27 @@ class restclient {
         $config = get_config('mod_selflearn');
         
         if (empty($config->selflearn_base_url)) {
-            throw new Exception(get_string("error::No SelfLearn Base URL configured", "mod_selflearn"));
+            throw new Exception(get_string("error::No_SelfLearn_Base_URL_configured", "mod_selflearn"));
         }
         $this->selflearn_website = $config->selflearn_base_url;
         $this->selflearn_rest_api = $config->selflearn_base_url . REST_API;
         
         // Load OAuth2 service, which is configured to be used with this plugin
         if (empty($config->selflearn_oauth2_provider)) {
-            throw new Exception(get_string("error::No OAuth2 provider configured", "mod_selflearn"));
+            error_log("SelfLearn: No OAuth2 provider configured.");
+            throw new Exception(get_string("error::No_OAuth2_provider_configured", "mod_selflearn"));
         } 
 
         // Get sertvice account
         $api = new api();
-        $issuer = $api->get_issuer($config->selflearn_oauth2_provider);
+        try {
+            $issuer = $api->get_issuer($config->selflearn_oauth2_provider);
+        } catch (moodle_exception $e) {
+            // Will throw dml_missing_record_exception, if issuer was not found
+            // or invalid/outdated provider was selected
+            error_log("SelfLearn: Wrong (probably non-existend) OAuth2 provider configured, with id = {$config->selflearn_oauth2_provider}");
+            throw new Exception(get_string("error::OAuth2_misconfigured", "mod_selflearn"));
+        }
 
         // Load OAuth2 client
         $current_page = $PAGE->url->out_as_local_url(false);
@@ -133,11 +141,11 @@ class restclient {
     
     function selflearn_get_course_title($slug) {
         $lms_url = $this->selflearn_rest_api . "courses/" . $slug;
-    
+
         // Query
         $response = $this->client->get($lms_url);
         $http_status = $this->client->get_info()['http_code'];
-        
+
         if ($http_status == 404) {
             // Course data not found for given slug, use fallback "Course: slug"
             return get_string("activity_prefix_course", 'selflearn') . $slug;
@@ -145,6 +153,24 @@ class restclient {
             $data = $this->handle_response($response);
             return $data['title'];
         }
+    }
+
+    /**
+     * Get course progress for multiple students
+     * @param string $slug Course slug
+     * @param array $usernames Array of student usernames
+     * @return array Array of progress data with username and progress percentage
+     */
+    function selflearn_get_course_progress($slug, $usernames) {
+        $progress_url = $this->selflearn_rest_api . "courses/" . $slug . "/progress";
+
+        $params = [];
+        if (!empty($usernames)) {
+            $params['usernames'] = implode(',', $usernames);
+        }
+
+        $response = $this->client->get($progress_url, $params);
+        return $this->handle_response($response);
     }
 }
 
