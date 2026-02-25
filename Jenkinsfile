@@ -23,20 +23,6 @@ pipeline {
 				checkout scm
 			}
 		}
-		stage('Checkout sanity') {
-		  steps {
-			sh '''
-			  set -eu
-			  echo "=== host workspace ==="
-			  pwd
-			  ls -la
-			  echo "=== git status ==="
-			  git rev-parse --is-inside-work-tree && git status --porcelain=v1 || true
-			  echo "=== find version.php ==="
-			  find . -maxdepth 4 -name version.php -print || true
-			'''
-		  }
-		}
 		stage('Test') {
             environment {
 				POSTGRES_DB = 'MoodleDb'
@@ -119,7 +105,11 @@ PHP
 
           php public/admin/tool/phpunit/cli/init.php
 
-          php vendor/bin/phpunit public/mod/selflearn/tests --log-junit "$WORKSPACE/build/test-results/junit.xml"
+		  cd public
+		  echo "PWD=$(pwd)"
+ls -la mod/selflearn || true
+ls -la mod/selflearn/tests || true
+          php vendor/bin/phpunit mod/selflearn/tests --log-junit "$WORKSPACE/build/test-results/junit.xml"
         '''
                     }
 				}
