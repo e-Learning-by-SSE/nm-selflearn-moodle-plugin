@@ -45,8 +45,7 @@ pipeline {
           set -euxo pipefail
 
           # Where Moodle lives in your image
-          MOODLE_DIR=/var/www/html/
-          # PLUGIN_DIR=$MOODLE_DIR/public/mod/selflearn
+          MOODLE_DIR=/var/www/html/public
 
           # Reports + dataroot (must be writable)
           mkdir -p "$WORKSPACE/build/test-results"
@@ -54,17 +53,6 @@ pipeline {
 		  mkdir -p "$WORKSPACE/moodledata_phpunit"
 		  rm -rf /moodledata_phpunit || true
 		  ln -s "$WORKSPACE/moodledata_phpunit" /moodledata_phpunit
-
-          # 1) Put plugin into Moodle (copy workspace -> mod/selflearn)
-          #    We copy (not mount) because we're already inside the Moodle container.
-          #rm -rf "$PLUGIN_DIR"
-          #mkdir -p "$(dirname "$PLUGIN_DIR")"
-          #rsync -a --delete \
-          #  --exclude '.git/' \
-          #  --exclude 'moodledata/' \
-          #  --exclude 'build/' \
-          #  --exclude 'Jenkinsfile' \
-          #  "$WORKSPACE/" "$PLUGIN_DIR/"
 
           # 2) Create config.php for CI using Postgres sidecar "db"
           cat > "$MOODLE_DIR/config.php" <<'PHP'
@@ -103,13 +91,9 @@ PHP
           # 3) Run PHPUnit init + tests + JUnit report
           cd "$MOODLE_DIR"
 
-          php public/admin/tool/phpunit/cli/init.php
+          php admin/tool/phpunit/cli/init.php
 
-		  cd public
-		  echo "PWD=$(pwd)"
-ls -la mod/selflearn || true
-ls -la mod/selflearn/tests || true
-          php vendor/bin/phpunit mod/selflearn/tests --log-junit "$WORKSPACE/build/test-results/junit.xml"
+          php admin/tool/phpunit/cli/run.php mod/selflearn/tests --log-junit "$WORKSPACE/build/test-results/junit.xml"
         '''
                     }
 				}
