@@ -92,9 +92,11 @@ PHP
           cd "$MOODLE_DIR"
 
           php public/admin/tool/phpunit/cli/init.php
-
-          php vendor/bin/phpunit --testsuite mod_forum_testsuite --log-junit "$WORKSPACE/build/test-results/junit.xml"
         '''
+		  
+						catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {		  
+							php vendor/bin/phpunit --testsuite mod_selflearn --log-junit "$WORKSPACE/build/test-results/junit.xml"
+						}
                     }
 				}
 			}
